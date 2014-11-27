@@ -3,7 +3,7 @@
 	<name>msc_thesis</name>
 	<comment></comment>
 	<projects>
-		<project>EMAproject</project>
+		<project>EMAworkbench</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -15,4 +15,11 @@
 	<natures>
 		<nature>org.python.pydev.pythonNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>src/netlogo-models</name>
+			<type>2</type>
+			<location>C:/Users/rluteijn/OneDrive/Afstudeer/Netlogo/Officiele modellen</location>
+		</link>
+	</linkedResources>
 </projectDescription>
