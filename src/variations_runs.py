@@ -4,20 +4,15 @@ Created on 16 dec. 2014
 @author: rluteijn
 '''
 
-from expWorkbench import save_results, ema_logging, CategoricalUncertainty,\
+from expWorkbench import save_results, ema_logging, ParameterUncertainty, CategoricalUncertainty,\
                          Outcome, ModelEnsemble
 from connectors.netlogo import NetLogoModelStructureInterface
 
 class PathOfWarModel(NetLogoModelStructureInterface):
-    model_file = r'/Model 0.57.nlogo'    
-    run_length = 300
+    model_file = r'/Model 0.61.nlogo'    
+    run_length = 500
     
-    uncertainties = [
-					#CategoricalUncertainty ((0.1, 0.2), "SD-perception"),
-					#CategoricalUncertainty ((5, 12), "memory-duration"),	
-                    #CategoricalUncertainty ((0.05, 0.15), "random-pAttack"),
-                    
-                    CategoricalUncertainty ((3, 6), "threshold-dissatisfaction"),						
+    uncertainties = [	ParameterUncertainty((4.5,5.5), "w1",integer=True),
                     ]
     
     outcomes = [ ## globals may be imported directly
@@ -43,7 +38,7 @@ if __name__ == '__main__':
     ensemble.add_model_structure(msi)
     ensemble.parallel =  True
     
-    nr_runs = 200
+    nr_runs = 100
     results = ensemble.perform_experiments(nr_runs, reporting_interval=1)
     
     fn = r'./data/{} runs.tar.gz'.format(nr_runs)

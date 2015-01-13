@@ -21,12 +21,33 @@ fn = r'./data/800 runs.tar.gz'
 experiments, outcomes = load_results(fn)
 results = (experiments, outcomes)
 
-logical = experiments['random-pAttack'] == 0.05
-new_experiments = experiments[ logical ]
-new_results = {}
-for key, value in outcomes.items():
-    new_results[key] = value[logical]
+def group_results(results, unc, value):
+    logical = experiments[unc] = value
+    temp_exp = experiments[logical]
+    temp_out = {}
+    for key, value in outcomes.items():
+        temp_out[key] = value[logical]
+        return temp_exp, temp_out
 
-results = (new_experiments, new_results)
+unc = 'random-pAttack'
+#unc = "SD-perception"
+#unc = "random-pAttack"
+values = set(experiments[unc])
 
-plt.show()
+
+for entry in values:
+    temp_res  = group_results(results, unc, entry)
+    fig, axesdict = multiple_densities(results, 
+                           outcomes_to_show=["war-counter", "amount-conflicts", "power-transition-counter" ],
+                           points_in_time=[100, 200, 300],
+                           #group_by = 'memory-duration',
+                           #grouping_specifiers = None,
+                           density=KDE,
+                           titles={},
+                           ylabels={},
+                           legend=True,
+                           experiments_to_show=None,
+                           plot_type=ENV_LIN,
+                           log=False)
+    
+    plt.show()

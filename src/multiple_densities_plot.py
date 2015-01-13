@@ -19,15 +19,15 @@ from string import index
 ema_logging.log_to_stderr(ema_logging.INFO);
 
 #load the data
-fn = r'./data/800 runs.tar.gz'
+fn = r'./data/500 runs.tar.gz'
 experiments, outcomes = load_results(fn)
 results = (experiments, outcomes)
 
 fig, axesdict = multiple_densities(results, 
-                       outcomes_to_show=["states","major-power-war-counter","war-counter", "polarity", "amount-conflicts", "power-transition-counter" ],
-                       points_in_time=[100, 200, 300],
-                       #group_by = 'memory-duration',
-                       #grouping_specifiers = None,
+                       outcomes_to_show=["major-power-war-counter","war-counter", "polarity", "amount-conflicts", "power-transition-counter" ],
+                       points_in_time=[100, 200, 300],## 500, 700, 800],
+                       group_by = "coercion_on",
+                       grouping_specifiers = [0,1],
                        density=KDE,
                        titles={},
                        ylabels={},
