@@ -18,7 +18,7 @@ from analysis.plotting_util import plot_kde, ENVELOPE, ENV_LIN
 ema_logging.log_to_stderr(ema_logging.INFO);
 
 #load the data
-fn = r'./data/800 runs.tar.gz'
+fn = r'./data/10 runs.tar.gz'
 experiments, outcomes = load_results(fn)
 results = (experiments, outcomes)
 
