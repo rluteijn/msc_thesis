@@ -3,13 +3,9 @@ Created on 25 nov. 2014
 
 @author: rluteijn
 '''
-import os
-import numpy as np
-
 from expWorkbench import save_results, ema_logging, ParameterUncertainty,CategoricalUncertainty, \
                          Outcome, ModelEnsemble
 from connectors.netlogo import NetLogoModelStructureInterface
-from expWorkbench.ema_exceptions import CaseError
 
 class PathOfWarModel(NetLogoModelStructureInterface):
     model_file = r'/Model 0.65a.nlogo'
@@ -89,15 +85,6 @@ class PathOfWarModel(NetLogoModelStructureInterface):
 #                 Outcome("Power-end2", time = True ),
 #                 Outcome("Interdependence-end1end2", time = True ),
 #                 Outcome("Conflict-level-end1end2", time = True ),
-                
-                Outcome("Output-Inflection-point-end1", time = True ),
-                Outcome("Output-Inflection-point-end2", time = True ),
-                Outcome("Output-FPR-end1", time = True ),
-                Outcome("Output-FPR-end2", time = True ),
-                Outcome("Output-Power-end1", time = True ),
-                Outcome("Output-Power-end2", time = True ),
-                Outcome("Output-Interdependence-end1end2", time = True ),
-                Outcome("Output-Conflict-level-end1end2", time = True ),
 #                 Outcome("polarisation", time=True ),                
                 Outcome("states", time=True ),
                 Outcome("major-power-war-counter", time=True),
@@ -105,25 +92,25 @@ class PathOfWarModel(NetLogoModelStructureInterface):
                 Outcome("polarity", time=True),
                 Outcome("amount-conflicts", time=True),
                 Outcome("power-transition-counter", time=True),                   
-#                 Outcome("inflection-state1", time=True),
-#                 Outcome("FPR-satisfaction-state1", time=True),
-#                 Outcome("power-1", time=True),
-#                 Outcome("interdependence-1", time=True),
-#                 Outcome("amount-of-conflicts1", time=True),         
-#                 Outcome("amount-of-conflicts2", time=True),        
-#                 Outcome("conflict-no-interaction", time=True),
-#                 Outcome("conflict-too-long", time=True),                  
-#                 Outcome("states-missing-resources", time=True),
-#                 Outcome("trade-severed", time=True),                  
-#                 Outcome("count-1", time=True),
-#                 Outcome("count-2", time=True),
-#                 Outcome("count-3", time=True),
-#                 Outcome("count-4", time=True),
-#                 Outcome("count-5", time=True),
-#                 Outcome("count-6", time=True),
-#                 Outcome("count-7", time=True), 
-#                 Outcome("count-8", time=True),
-#                 Outcome("count-9", time=True),                 
+                Outcome("inflection-state1", time=True),
+                Outcome("FPR-satisfaction-state1", time=True),
+                Outcome("power-1", time=True),
+                Outcome("interdependence-1", time=True),
+                Outcome("amount-of-conflicts1", time=True),         
+                Outcome("amount-of-conflicts2", time=True),        
+                Outcome("conflict-no-interaction", time=True),
+                Outcome("conflict-too-long", time=True),                  
+                Outcome("states-missing-resources", time=True),
+                Outcome("trade-severed", time=True),                  
+                Outcome("count-1", time=True),
+                Outcome("count-2", time=True),
+                Outcome("count-3", time=True),
+                Outcome("count-4", time=True),
+                Outcome("count-5", time=True),
+                Outcome("count-6", time=True),
+                Outcome("count-7", time=True), 
+                Outcome("count-8", time=True),
+                Outcome("count-9", time=True),                 
 #                 Outcome("interact-1", time=True),  
 #                 Outcome("interact-2", time=True),
 #                 Outcome("interact-3", time=True),
@@ -147,98 +134,14 @@ class PathOfWarModel(NetLogoModelStructureInterface):
 #                 Outcome("interact-21", time=True),
 #                 Outcome("interact-22", time=True),
 #                 Outcome("interact-23", time=True),
-#                 Outcome("inflection-1", time=True),
-#                 Outcome("inflection-2", time=True),
-#                 Outcome("inflection-3", time=True),
-#                 Outcome("inflection-4", time=True),
-#                 Outcome("inflection-5", time=True),
-#                 Outcome("inflection-6", time=True),
-#                 Outcome("inflection-7", time=True),
+                Outcome("inflection-1", time=True),
+                Outcome("inflection-2", time=True),
+                Outcome("inflection-3", time=True),
+                Outcome("inflection-4", time=True),
+                Outcome("inflection-5", time=True),
+                Outcome("inflection-6", time=True),
+                Outcome("inflection-7", time=True),
                 ]
-    
-#     def _handle_outcomes(self, fns):
-#       
-#         for key, value in fns.iteritems():
-#             if key in self.normal_handling:
-#                 with open(value) as fh:
-#                     result = fh.readline()
-#                     result = result.strip()
-#                     result = result.split()
-#                     result = [float(entry) for entry in result]
-#                     self.output[key] = np.asarray(result)
-#                 os.remove(value)    
-#                 
-#             elif key in self.once_handling:    
-#                 with open(value) as fh:
-#                     result = fh.readline()
-#                     result = result.strip()
-#                     result = result.split(']')
-#                     result = result.split(']')
-#                     result = [float(entry) for entry in result]
-#                     self.output[key] = np.asarray(result)
-#                 os.remove(value)    
-#             
-#             elif key in self.abnormal_handling:
-#                 with open(value) as fh:
-#                     result = fh.readline()
-#                     result = result.strip()
-#                     result = result.split(']')
-#                     results = np.zeros((self.run_length*6,))
-#                     for i, entry in enumerate(result):
-#                         entry = entry.strip()
-#                         entry = entry.strip('[')
-#                         
-#                         if entry:
-#                             entry = float(entry)
-#                         else:
-#                             entry = 0
-#                         results[i] = entry
-# 
-#                     self.output[key] = results
-# 
-#             else:
-#                 raise CaseError('no hander specified for {}'.format(key), {})
-#             
-#             
-#     normal_handling = set(["states",
-#                            "major-power-war-counter",
-#                            "war-counter",
-#                            "polarity",
-#                            "amount-conflicts",
-#                            "power-transition-counter",
-#                            "Output-Inflection-point-end1",
-#                             "Output-Inflection-point-end2",
-#                             "Output-FPR-end1",
-#                             "Output-FPR-end2",
-#                             "Output-Power-end1",
-#                             "Output-Power-end2",
-#                             "Output-Interdependence-end1end2",
-#                             "Output-Conflict-level-end1end2" ,
-#                            ])
-#     
-# #     abnormal_handling = set([
-# #                             "Inflection-point-end1",
-# #                             "Inflection-point-end2",
-# #                             "FPR-end1",
-# #                             "FPR-end2",
-# #                             "Power-end1",
-# #                             "Power-end2",
-# #                             "Interdependence-end1end2",
-# #                             "Conflict-level-end1end2",
-# #                              ])
-#     
-#     once_handling = set ([ 
-# #                             "Output-Inflection-point-end1",
-# #                             "Output-Inflection-point-end2",
-# #                             "Output-FPR-end1",
-# #                             "Output-FPR-end2",
-# #                             "Output-Power-end1",
-# #                             "Output-Power-end2",
-# #                             "Output-Interdependence-end1end2",
-# #                             "Output-Conflict-level-end1end2"                         
-#                           
-#                           ])
-
 
 if __name__ == '__main__':
     ema_logging.log_to_stderr(ema_logging.INFO)
@@ -251,8 +154,9 @@ if __name__ == '__main__':
     ensemble.add_model_structure(msi)
 #     ensemble.parallel =  True
     
-    nr_runs = 8
+    nr_runs = 2
     results = ensemble.perform_experiments(nr_runs, reporting_interval=1)
     
-    fn = r'./data/{} runs 15 jan.tar.gz'.format(nr_runs)
+    fn = r'./data/{} runs 13 jan.tar.gz'.format(nr_runs)
     save_results(results, fn)  
+

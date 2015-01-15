@@ -1,4 +1,4 @@
-;;extensions [nw array]
+extensions [nw ]
 
 ;; <<<<<<<<<<<<<<<<<<<< Variable definitions and Breed creation >>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -445,13 +445,12 @@ to go
   carefully [update-attitudes] [ print "update-attitudes" print error-message]
   carefully [conflictmemory] [ print "conflictmemory" print error-message]
   carefully [foreign-policy-role] [ print "foreign-policy-role" print error-message]
-  ;;produce-final-output
+  produce-final-output
   tick  
 end
 
 
 to update-attributes ;; endogenous growth of variables since last tick
-  
   carefully [
     ask patches with [water = false][
       let change-in_GDPpercapita-growth random-normal 0 0.01
@@ -1334,49 +1333,40 @@ to set-output [ #first #second ]
       set Interdependence-end1end2 lput [Interdependence-magnitude] of target Interdependence-end1end2
       set Conflict-level-end1end2 lput [Conflict-level] of target Conflict-level-end1end2
       
-      ;;nw:set-context states diplomaticrelations
-      ;;ask #first [
-        ;;let centrality1 nw:eigenvector-centrality
-        ;;let weighted-att1 nw:weighted-closeness-centrality "attitude"
-        ;;let weighted-id1 nw:weighted-closeness-centrality "ideology-similarity"
-        ;;set polarisation lput centrality1 polarisation
-        ;;set polarisation3 lput weighted-att1 polarisation3
-        ;;set polarisation5 lput weighted-id1 polarisation5
-      ;;]
+      nw:set-context states diplomaticrelations
+      ask #first [
+        let centrality1 nw:eigenvector-centrality
+        let weighted-att1 nw:weighted-closeness-centrality "attitude"
+        let weighted-id1 nw:weighted-closeness-centrality "ideology-similarity"
+        set polarisation lput centrality1 polarisation
+        set polarisation3 lput weighted-att1 polarisation3
+        set polarisation5 lput weighted-id1 polarisation5
+      ]
       
-      ;;ask #second [
-      ;;  let centrality2 nw:eigenvector-centrality
-      ;;  let weighted-att2 nw:weighted-closeness-centrality "attitude"
-      ;;  let weighted-id2 nw:weighted-closeness-centrality "ideology-similarity"        
-      ;;  set polarisation2 lput centrality2 polarisation2
-      ;;  set polarisation4 lput weighted-att2 polarisation4
-      ;;  set polarisation6 lput weighted-id2 polarisation6
-     ;; ]
+      ask #second [
+        let centrality2 nw:eigenvector-centrality
+        let weighted-att2 nw:weighted-closeness-centrality "attitude"
+        let weighted-id2 nw:weighted-closeness-centrality "ideology-similarity"        
+        set polarisation2 lput centrality2 polarisation2
+        set polarisation4 lput weighted-att2 polarisation4
+        set polarisation6 lput weighted-id2 polarisation6
+      ]
     ]] [ print error-message print 200]
 end
 
 to produce-final-output
-  if ( ticks = 500) [
+  if ( ticks = 499) [
     
-    ;;Output-Inflection-point-end1
-    ;; Output-Inflection-point-end2
-  ;;   Output-FPR-end1
- ;;    Output-FPR-end2
- ;;  ;;   Output-Power-end1
- ;;    Output-Power-end2
-  ;;   Output-Interdependence-end1end2
- ;;    Output-Conflict-level-end1end2
- ;;    Output-polarity
- ;;    Output-power-transition
- ;;    Output-polarisation
-    ;;set Inflection-point-end1 array:from-list Inflection-point-end1
-    ;;set Inflection-point-end2 array:from-list Inflection-point-end2
-    ;;set FPR-end1 array:from-list FPR-end1
-    ;;set FPR-end2 array:from-list FPR-end2
-    ;;set Power-end1 array:from-list Power-end1
-    ;;set Power-end2 array:from-list Power-end2
-    ;;set Interdependence-end1end2 array:from-list Interdependence-end1end2
-    ;;set Conflict-level-end1end2 array:from-list Conflict-level-end1end2
+    ;;    Output-power-transition
+    ;;    Output-polarisation
+    set Output-Inflection-point-end1 Inflection-point-end1 
+    set Output-Inflection-point-end2 Inflection-point-end2 
+    set Output-FPR-end1 FPR-end1 
+    set Output-FPR-end2 FPR-end2 
+    set Output-Power-end1 Power-end1 
+    set Output-Power-end2 Power-end2 
+    set Output-Interdependence-end1end2 Interdependence-end1end2 
+    set Output-Conflict-level-end1end2 Conflict-level-end1end2 
   ]
 end
 

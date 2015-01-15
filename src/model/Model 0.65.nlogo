@@ -1,4 +1,4 @@
-extensions [nw array]
+extensions [nw]
 
 ;; <<<<<<<<<<<<<<<<<<<< Variable definitions and Breed creation >>>>>>>>>>>>>>>>>>>>>>>>>>>
 
