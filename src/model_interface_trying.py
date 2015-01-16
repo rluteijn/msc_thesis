@@ -13,10 +13,10 @@ from connectors.netlogo import NetLogoModelStructureInterface
 from expWorkbench.ema_exceptions import CaseError
 
 class PathOfWarModel(NetLogoModelStructureInterface):
-    model_file = r'/Model 0.66.nlogo'
+    model_file = r'/Model 0.66a.nlogo'
     
     run_length = 500
-    replications = 10
+    replications = 2
    
     uncertainties = [
                         ParameterUncertainty ((0, 0.3), "SD-perception"),
@@ -83,21 +83,21 @@ class PathOfWarModel(NetLogoModelStructureInterface):
                     ]
     
     outcomes = [ 
-                Outcome("Output-Inflection-point-end1", time = True ),
-                Outcome("Output-Inflection-point-end2", time = True ),
-                Outcome("Output-FPR-end1", time = True ),
-                Outcome("Output-FPR-end2", time = True ),
-                Outcome("Output-Power-end1", time = True ),
-                Outcome("Output-Power-end2", time = True ),
-                Outcome("Output-Interdependence-end1end2", time = True ),
-                Outcome("Output-Conflict-level-end1end2", time = True ),
+                Outcome("Output-Inflection-point-end1"),
+                Outcome("Output-Inflection-point-end2"),
+                Outcome("Output-FPR-end1"),
+                Outcome("Output-FPR-end2"),
+                Outcome("Output-Power-end1"),
+                Outcome("Output-Power-end2"),
+                Outcome("Output-Interdependence-end1end2"),
+                Outcome("Output-Conflict-level-end1end2"),
    
-                Outcome("output-polarisation", time=True ),
-                Outcome("output-polarisation2", time=True ),
-                Outcome("output-polarisation3", time=True ),
-                Outcome("output-polarisation4", time=True ),
-                Outcome("output-polarisation5", time=True ),
-                Outcome("output-polarisation6", time=True ),
+#                 Outcome("output-polarisation", time=True ),
+#                 Outcome("output-polarisation2", time=True ),
+#                 Outcome("output-polarisation3", time=True ),
+#                 Outcome("output-polarisation4", time=True ),
+#                 Outcome("output-polarisation5", time=True ),
+#                 Outcome("output-polarisation6", time=True ),
 
                 Outcome("states", time=True ),
                 Outcome("major-power-war-counter", time=True),
@@ -108,47 +108,63 @@ class PathOfWarModel(NetLogoModelStructureInterface):
 
                 ]
     
-    def run_model(self, case):             
-        for rep in range(self.replications):
+    def run_model(self, case):           
+        temp_output = {}  
+        for _ in range(self.replications):
             NetLogoModelStructureInterface.run_model(self, case)
-
+            
+            output = self.retrieve_output()
+               
+            for key, value in output.iteritems():
+                try:
+                    temp_output[key].append(value)
+                except KeyError:
+                    temp_output[key] = [value]
+           
+        self.output = {}
+        for key, value in temp_output.iteritems():
+            value = np.asarray(value)
+            self.output[key] = value
             
     def _handle_outcomes(self, fns):                  
-            for key, value in fns.iteritems():
-                if key in self.normal_handling: # voor "normale" globals werkt dit
-                    with open(value) as fh:    
-                        result = fh.readline()
-                        result = result.strip()
-                        result = result.split()
-                        result = [float(entry) for entry in result]
-                        self.output[key] = np.asarray(result)
-                        os.remove(value) 
-
-                elif key in self.once_handling:
-                    with open(value) as fh:
-                        result = fh.readline() # lees line die bestaat uit nullen en een list 
-                        result = result.strip() #spaties weghalen
-                        result = result.split() # splitsen op elementen: nullen en een list
-                        results = np.zeros((self.run_length*6,)) # lege array maken
-                        for i, entry in enumerate(result): # voor elk element in de lijst result nu het volgende uitvoeren:
-                            entry = entry.strip() # spaties weghalen, welke alleen in de lijst nog zitten eventueel
-                            entry = entry.strip('[')# haakje weghalen, welke alleen in de lijst nog zitten eventueel
-                            entry = entry.strip(']')# haakje weghalen, welke alleen in de lijst nog zitten eventueel
-                            entry = entry.split() #lijst splitsen? --> wat doet dit met andere elementen?
-                            
-                            for j, item in enumerate(entry): 
-                            
-                                if item:
-                                    item = float(item)
-                                else:
-                                    item = 0
-                                results[j] = item
-    
-                        self.output[key] = results
-                        os.remove(value)
-
-                else:
-                    raise CaseError('no hander specified for {}'.format(key), {})
+        for key, value in fns.iteritems():
+            if key in self.normal_handling: # voor "normale" globals werkt dit
+                with open(value) as fh:    
+                    result = fh.readline()
+                    result = result.strip()
+                    result = result.split()
+                    result = [float(entry) for entry in result]
+                    self.output[key] = np.asarray(result)
+            elif key in self.once_handling:
+                with open(value) as fh:
+                    result = fh.readline() # lees line die bestaat uit nullen en een list 
+                    result = result.strip() #spaties weghalen
+                    result = result.split() # splitsen op elementen: nullen en een list
+                    results = np.zeros((self.run_length*6,)) # lege array maken
+                    for i, entry in enumerate(result): # voor elk element in de lijst result nu het volgende uitvoeren:
+                        entry = entry.strip() # spaties weghalen, welke alleen in de lijst nog zitten eventueel
+                        entry = entry.strip('[')# haakje weghalen, welke alleen in de lijst nog zitten eventueel
+                        entry = entry.strip(']')# haakje weghalen, welke alleen in de lijst nog zitten eventueel
+                        entry = entry.split() #lijst splitsen? --> wat doet dit met andere elementen?
+                         
+                        for j, item in enumerate(entry): 
+                         
+                            if item:
+                                item = float(item)
+                            else:
+                                item = 0
+                            results[j] = item
+                    self.output[key] = results
+            else:
+                raise CaseError('no hander specified for {}'.format(key), {})
+             
+        for value in fns.values():
+            ema_logging.debug('value: {}'.format(value))
+             
+            try:
+                os.remove(value)
+            except WindowsError:
+                pass
 
  
     normal_handling = set([
@@ -169,12 +185,12 @@ class PathOfWarModel(NetLogoModelStructureInterface):
                             "Output-Power-end2",
                             "Output-Interdependence-end1end2",
                             "Output-Conflict-level-end1end2",                            
-                            "output-polarisation",
-                            "output-polarisation2",
-                            "output-polarisation3",
-                            "output-polarisation4",
-                            "output-polarisation5",
-                            "output-polarisation6",
+#                             "output-polarisation",
+#                             "output-polarisation2",
+#                             "output-polarisation3",
+#                             "output-polarisation4",
+#                             "output-polarisation5",
+#                             "output-polarisation6",
                             ])                    
 
 if __name__ == '__main__':
@@ -183,12 +199,12 @@ if __name__ == '__main__':
     wd = r'./model'
     name = 'testmodel'
     msi = PathOfWarModel(wd, name) 
-    
+    msi.run_length = 20
     ensemble = ModelEnsemble()
     ensemble.add_model_structure(msi)
 #     ensemble.parallel =  True
     
-    nr_runs = 2
+    nr_runs = 8
     results = ensemble.perform_experiments(nr_runs, reporting_interval=1)
     
     fn = r'./data/{} runs 16 jan.tar.gz'.format(nr_runs)

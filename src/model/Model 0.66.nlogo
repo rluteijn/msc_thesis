@@ -248,6 +248,7 @@ to setup-state-variables
     set tradingpartners [other-end] of my-in-exports
     set Invaluable-partners []
     set power-transition []
+    
     set power-memory []
     set power-growth-memory []
     set Power-growth-memory-derivation []
@@ -260,6 +261,8 @@ to setup-state-variables
     set ideology []
     repeat Length_of_culture_list [ set ideology lput (random 10) ideology ]
   ]  
+  
+  set major-power-war-counter 0
 end
 
 ;; <<<<<<<<<<<<<<<<<<<< Setup 7 >>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -1218,6 +1221,7 @@ end
 
 to set-output [ #first #second ]
 
+ifelse (ticks > memory-length) [
     if ( #first != nobody AND #second != nobody AND (diplomaticrelation [who] of #first [who] of #second) != nobody AND ticks > memory-length) [
       set major-power-war-counter major-power-war-counter + 1
       
@@ -1249,7 +1253,24 @@ to set-output [ #first #second ]
         set polarisation4 lput weighted-att2 polarisation4
         set polarisation6 lput weighted-id2 polarisation6
       ]
-    ]
+    ]]
+[
+  
+  set Inflection-point-end1 0
+  set Inflection-point-end2 0
+  set FPR-end1 0
+  set FPR-end2 0
+  set Power-end1 0
+  set Power-end2 0
+  set Interdependence-end1end2 0
+  set Conflict-level-end1end2 0
+  set polarisation 0
+  set polarisation2 0
+  set polarisation3 0
+  set polarisation4 0
+  set polarisation5 0
+  set polarisation6 0
+]
 end
 
 to produce-final-output
@@ -1789,7 +1810,7 @@ INPUTBOX
 710
 1235
 random-pAttack
-0.01
+0.1
 1
 0
 Number
@@ -2263,7 +2284,7 @@ INPUTBOX
 657
 1517
 distance-slope
-0.4
+0.2
 1
 0
 Number
@@ -2835,6 +2856,197 @@ NetLogo 5.1.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
+<experiments>
+  <experiment name="experiment" repetitions="5" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <metric>count states</metric>
+    <enumeratedValueSet variable="reparations-5">
+      <value value="0.7"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="attitude-decrease-submitted">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="SD-GDP-growth">
+      <value value="0.0010"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="reparations-4">
+      <value value="0.4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="amount-of-states">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="reparations-3">
+      <value value="0.2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="reparations-1">
+      <value value="0.05"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="SD-initial-trade-volume">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="amount_of_ideology_change">
+      <value value="0.2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="attitude-decrease-friendly">
+      <value value="0.2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="threshold-dissatisfaction">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="mean-Perception">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="mean-GDP-growth">
+      <value value="1.001"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="mean-tradevolume-growth">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="memory-length">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="attitude-trade-increase">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="mean-initial-military-capabilities">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cost-per-distance">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="likelihoodofresourcespresent">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="interdependence-pAttack">
+      <value value="0.01"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="worldsize">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Length_of_culture_list">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="SD-initial-military-capabilities">
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="mean-population-growth">
+      <value value="1.001"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="threshold-deescalate">
+      <value value="0.8"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="SD-population-growth">
+      <value value="0.0010"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="coercion_on">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="water-percentage">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="uw2">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Max-initial-patch-population">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="pWinning-factor">
+      <value value="0.62"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="increased-mil-spending">
+      <value value="0.25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="attrition-2">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="uw4">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="attitude-increase-alliance">
+      <value value="0.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="attrition-4">
+      <value value="0.6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="SD-tradevolume-growth">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="uw3">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="give-in-compensation">
+      <value value="0.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Max-initial-GDPperCapita">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="SD-military-spending">
+      <value value="0.0010"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="attrition-1">
+      <value value="0.05"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="population-GDP-factor">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="mean-initial-trade-volume">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="SD-perception">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="attrition-3">
+      <value value="0.2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="attrition-5">
+      <value value="0.7"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="inflection-point-deviation-zero">
+      <value value="0.01"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="uw5">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="reparations-2">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="threshold-counter">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="threshold-escalate">
+      <value value="2.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="uw1">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="attitude-decrease-war">
+      <value value="0.75"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cost-of-new-trade">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Threshold-major-power">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="FPR-impact">
+      <value value="0.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="mean-military-spending">
+      <value value="0.01"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="random-pAttack">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="attitude-decrease-bargain">
+      <value value="0.3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="distance-slope">
+      <value value="0.2"/>
+      <value value="0.4"/>
+    </enumeratedValueSet>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
