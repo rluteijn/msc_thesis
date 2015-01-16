@@ -92,25 +92,25 @@ class PathOfWarModel(NetLogoModelStructureInterface):
                 Outcome("polarity", time=True),
                 Outcome("amount-conflicts", time=True),
                 Outcome("power-transition-counter", time=True),                   
-                Outcome("inflection-state1", time=True),
-                Outcome("FPR-satisfaction-state1", time=True),
-                Outcome("power-1", time=True),
-                Outcome("interdependence-1", time=True),
-                Outcome("amount-of-conflicts1", time=True),         
-                Outcome("amount-of-conflicts2", time=True),        
-                Outcome("conflict-no-interaction", time=True),
-                Outcome("conflict-too-long", time=True),                  
-                Outcome("states-missing-resources", time=True),
-                Outcome("trade-severed", time=True),                  
-                Outcome("count-1", time=True),
-                Outcome("count-2", time=True),
-                Outcome("count-3", time=True),
-                Outcome("count-4", time=True),
-                Outcome("count-5", time=True),
-                Outcome("count-6", time=True),
-                Outcome("count-7", time=True), 
-                Outcome("count-8", time=True),
-                Outcome("count-9", time=True),                 
+#                 Outcome("inflection-state1", time=True),
+#                 Outcome("FPR-satisfaction-state1", time=True),
+#                 Outcome("power-1", time=True),
+#                 Outcome("interdependence-1", time=True),
+#                 Outcome("amount-of-conflicts1", time=True),         
+#                 Outcome("amount-of-conflicts2", time=True),        
+#                 Outcome("conflict-no-interaction", time=True),
+#                 Outcome("conflict-too-long", time=True),                  
+#                 Outcome("states-missing-resources", time=True),
+#                 Outcome("trade-severed", time=True),                  
+#                 Outcome("count-1", time=True),
+#                 Outcome("count-2", time=True),
+#                 Outcome("count-3", time=True),
+#                 Outcome("count-4", time=True),
+#                 Outcome("count-5", time=True),
+#                 Outcome("count-6", time=True),
+#                 Outcome("count-7", time=True), 
+#                 Outcome("count-8", time=True),
+#                 Outcome("count-9", time=True),                 
 #                 Outcome("interact-1", time=True),  
 #                 Outcome("interact-2", time=True),
 #                 Outcome("interact-3", time=True),
@@ -134,14 +134,16 @@ class PathOfWarModel(NetLogoModelStructureInterface):
 #                 Outcome("interact-21", time=True),
 #                 Outcome("interact-22", time=True),
 #                 Outcome("interact-23", time=True),
-                Outcome("inflection-1", time=True),
-                Outcome("inflection-2", time=True),
-                Outcome("inflection-3", time=True),
-                Outcome("inflection-4", time=True),
-                Outcome("inflection-5", time=True),
-                Outcome("inflection-6", time=True),
-                Outcome("inflection-7", time=True),
+#                 Outcome("inflection-1", time=True),
+#                 Outcome("inflection-2", time=True),
+#                 Outcome("inflection-3", time=True),
+#                 Outcome("inflection-4", time=True),
+#                 Outcome("inflection-5", time=True),
+#                 Outcome("inflection-6", time=True),
+#                 Outcome("inflection-7", time=True),
                 ]
+    
+    
 
 if __name__ == '__main__':
     ema_logging.log_to_stderr(ema_logging.INFO)
@@ -157,6 +159,5 @@ if __name__ == '__main__':
     nr_runs = 2
     results = ensemble.perform_experiments(nr_runs, reporting_interval=1)
     
-    fn = r'./data/{} runs 13 jan.tar.gz'.format(nr_runs)
+    fn = r'./data/{} runs 15 jan.tar.gz'.format(nr_runs)
     save_results(results, fn)  
-
