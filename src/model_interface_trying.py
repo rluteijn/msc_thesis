@@ -16,7 +16,7 @@ class PathOfWarModel(NetLogoModelStructureInterface):
     model_file = r'/Model 0.66.nlogo'
     
     run_length = 500
-    replications = 2
+    replications = 10
    
     uncertainties = [
                         ParameterUncertainty ((0, 0.3), "SD-perception"),
@@ -108,35 +108,35 @@ class PathOfWarModel(NetLogoModelStructureInterface):
 
                 ]
     
-    def run_model(self, case):
-             
+    def run_model(self, case):             
         for rep in range(self.replications):
             NetLogoModelStructureInterface.run_model(self, case)
-            output = self.retrieve_output()
+
             
     def _handle_outcomes(self, fns):                  
             for key, value in fns.iteritems():
-                if key in self.normal_handling:
+                if key in self.normal_handling: # voor "normale" globals werkt dit
                     with open(value) as fh:    
                         result = fh.readline()
                         result = result.strip()
                         result = result.split()
                         result = [float(entry) for entry in result]
                         self.output[key] = np.asarray(result)
-                    os.remove(value) 
+                        os.remove(value) 
 
                 elif key in self.once_handling:
                     with open(value) as fh:
-                        result = fh.readline()
-                        result = result.strip()
-                        result = result.split()
-                        results = np.zeros((self.run_length*6,))
-                        for i, entry in enumerate(result):
-                            entry = entry.strip()
-                            entry = entry.strip('[')
-                            entry = entry.strip(']')
+                        result = fh.readline() # lees line die bestaat uit nullen en een list 
+                        result = result.strip() #spaties weghalen
+                        result = result.split() # splitsen op elementen: nullen en een list
+                        results = np.zeros((self.run_length*6,)) # lege array maken
+                        for i, entry in enumerate(result): # voor elk element in de lijst result nu het volgende uitvoeren:
+                            entry = entry.strip() # spaties weghalen, welke alleen in de lijst nog zitten eventueel
+                            entry = entry.strip('[')# haakje weghalen, welke alleen in de lijst nog zitten eventueel
+                            entry = entry.strip(']')# haakje weghalen, welke alleen in de lijst nog zitten eventueel
+                            entry = entry.split() #lijst splitsen? --> wat doet dit met andere elementen?
                             
-                            for j, item in enumerate(entry):
+                            for j, item in enumerate(entry): 
                             
                                 if item:
                                     item = float(item)
@@ -145,7 +145,7 @@ class PathOfWarModel(NetLogoModelStructureInterface):
                                 results[j] = item
     
                         self.output[key] = results
-                    os.remove(value)
+                        os.remove(value)
 
                 else:
                     raise CaseError('no hander specified for {}'.format(key), {})
@@ -188,8 +188,8 @@ if __name__ == '__main__':
     ensemble.add_model_structure(msi)
 #     ensemble.parallel =  True
     
-    nr_runs = 8
+    nr_runs = 2
     results = ensemble.perform_experiments(nr_runs, reporting_interval=1)
     
-    fn = r'./data/{} runs 15 jan.tar.gz'.format(nr_runs)
+    fn = r'./data/{} runs 16 jan.tar.gz'.format(nr_runs)
     save_results(results, fn)  

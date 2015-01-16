@@ -154,10 +154,10 @@ if __name__ == '__main__':
     
     ensemble = ModelEnsemble()
     ensemble.add_model_structure(msi)
-#     ensemble.parallel =  True
+    ensemble.parallel =  True
     
-    nr_runs = 2
+    nr_runs = 8
     results = ensemble.perform_experiments(nr_runs, reporting_interval=1)
     
-    fn = r'./data/{} runs 15 jan.tar.gz'.format(nr_runs)
+    fn = r'./data/{} runs 16 jan.tar.gz'.format(nr_runs)
     save_results(results, fn)  
