@@ -16,7 +16,7 @@ class PathOfWarModel(NetLogoModelStructureInterface):
     model_file = r'/Model 0.66a.nlogo'
     
     run_length = 500
-    replications = 2
+    replications = 10
    
     uncertainties = [
                         ParameterUncertainty ((0, 0.3), "SD-perception"),
@@ -76,21 +76,21 @@ class PathOfWarModel(NetLogoModelStructureInterface):
                         ParameterUncertainty ((0, 0.03), "inflection-point-deviation-zero" ),
                         ParameterUncertainty ((3, 10), "Length_of_culture_list", integer = True ),
                         ParameterUncertainty ((0, 0.3), "amount_of_ideology_change" ),
-                        CategoricalUncertainty ((0, 1), "coercion_on"),
+#                         CategoricalUncertainty ((0, 1), "coercion_on"),
                         ParameterUncertainty ((0, 1), "FPR-impact"),
                         ##CategoricalUncertainty ((10, 20, 30), "worldsize" ),
                         ##CategoricalUncertainty ((2, 200), "amount-of-states"),
                     ]
     
     outcomes = [ 
-                Outcome("Output-Inflection-point-end1"),
-                Outcome("Output-Inflection-point-end2"),
-                Outcome("Output-FPR-end1"),
-                Outcome("Output-FPR-end2"),
-                Outcome("Output-Power-end1"),
-                Outcome("Output-Power-end2"),
-                Outcome("Output-Interdependence-end1end2"),
-                Outcome("Output-Conflict-level-end1end2"),
+                Outcome("Output-Inflection-point-end1", time=True),
+                Outcome("Output-Inflection-point-end2", time=True),
+                Outcome("Output-FPR-end1", time=True),
+                Outcome("Output-FPR-end2", time=True),
+                Outcome("Output-Power-end1", time=True),
+                Outcome("Output-Power-end2", time=True),
+                Outcome("Output-Interdependence-end1end2", time=True),
+                Outcome("Output-Conflict-level-end1end2", time=True),
    
 #                 Outcome("output-polarisation", time=True ),
 #                 Outcome("output-polarisation2", time=True ),
@@ -199,13 +199,13 @@ if __name__ == '__main__':
     wd = r'./model'
     name = 'testmodel'
     msi = PathOfWarModel(wd, name) 
-    msi.run_length = 20
+#     msi.run_length = 200
     ensemble = ModelEnsemble()
     ensemble.add_model_structure(msi)
-#     ensemble.parallel =  True
+    ensemble.parallel =  True
     
-    nr_runs = 8
+    nr_runs = 500
     results = ensemble.perform_experiments(nr_runs, reporting_interval=1)
     
-    fn = r'./data/{} runs 16 jan.tar.gz'.format(nr_runs)
+    fn = r'./data/{} runs 19 jan.tar.gz'.format(nr_runs)
     save_results(results, fn)  

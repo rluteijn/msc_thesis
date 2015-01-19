@@ -86,7 +86,7 @@ globals [
   major-power-war-counter  
   amount-conflicts
   
-
+  
   Inflection-point-end1
   Inflection-point-end2
   FPR-end1
@@ -124,7 +124,7 @@ globals [
   output-polarisation6 
   
   
-    total-population current-amount-of-states total-Militarycapabilities total-GDP total-area mean-GDP-cap Hegemon 
+  total-population current-amount-of-states total-Militarycapabilities total-GDP total-area mean-GDP-cap Hegemon 
 ]
 
 ;; <<<<<<<<<<<<<<<<<<<< Setup >>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -363,96 +363,96 @@ end
 
 
 to update-attributes ;; endogenous growth of variables since last tick
-
-    ask patches with [water = false][
-      let change-in_GDPpercapita-growth random-normal 0 0.01
-      set GDPpercapita-growth (GDPpercapita-growth + change-in_GDPpercapita-growth) 
-      let change-in_Population-growth population-GDP-factor * change-in_GDPpercapita-growth
-      set Population-growth Population-growth + change-in_Population-growth
-      set patch-population (patch-population * Population-growth)
-      set patch-GDPperCapita (patch-GDPperCapita * GDPpercapita-growth)    
-      set economic-size (patch-population * patch-GDPperCapita)
-      if ( patch-population < 0) [set patch-population 0]
-      if ( patch-GDPperCapita < 0) [set patch-GDPperCapita 0]
-    ]
-
   
-
-    ask states [ ;; update variables with endogeneous growth, set total values of import and export, set internal resource allocations
-      set my-provinces patches with [my-state = myself]
-      set count-provinces count my-provinces
-      set ExportSize sum [tradevolume] of my-out-exports
-      set ImportSize sum [tradevolume] of my-in-exports
-      
-      carefully [set GDP-E+I (sum [ economic-size] of my-provinces) ] [set GDP-E+I GDP-E+I  ]
-      carefully [set GDP GDP-E+I + Exportsize - Importsize] [set GDP GDP]
-      if (GDP <= 0) [ set GDP 1 ]
-      carefully [set Population (sum [patch-population] of my-provinces)] [ set population population ]
-      if (Population <= 0) [ set Population 1 ]
-      set GDPpercapita GDP / population
-      carefully [set technological-advancement GDPpercapita / mean-GDP-cap] [ set technological-advancement 1]
-      
-      let normal random-normal mean-military-spending SD-military-spending
-      let senseofsecurity-effects 1
-      carefully [ifelse (1 / senseofsecurity > 3) [set senseofsecurity-effects 3][set senseofsecurity-effects (1 / senseofsecurity)]] [set senseofsecurity-effects 0 ] ;; high sense of security means lower militar spending
-      let compensation-current-size (fighting-strength / GDP)
-      let increase 0
-      if ( Decision-spending = true ) [ set increase increased-mil-spending set Decision-spending false]
-      
-      let change senseofsecurity-effects - compensation-current-size
-      set MilitarySpending (1 + increase) + normal + (change / 5)
-      carefully [set MilitaryCapabilities (MilitaryCapabilities * MilitarySpending)] [ set MilitaryCapabilities MilitaryCapabilities]
-      if (MilitaryCapabilities <= 0) [ 
-        ifelse (change < 0) [
-          set MilitaryCapabilities 0 ]
-        [
-          set MilitaryCapabilities change
-        ]]    
-      
-      set fighting-strength technological-advancement * MilitaryCapabilities
-      
-      setup-globals
-      
-      let old-growth 0
-      let power-growth 0
-      let power-growth-growth 0
-      let old-power power
-      if (ticks > 1) [set old-growth last Power-growth-memory]
-      
-      set power set-power
-      
-      carefully [set power-growth ((power - old-power) / old-power)][set power-growth 0]
-      
-      carefully [ set power-growth-growth ((power-growth - old-growth) / old-growth)] [set power-growth-growth 0]
-      
-      if (length power-memory >= memory-length) [ set power-memory remove-item 0 power-memory ]
-      if (length Power-growth-memory >= memory-length) [ set Power-growth-memory remove-item 0 Power-growth-memory ]
-      if (length Power-growth-memory-derivation >= memory-length) [ set Power-growth-memory-derivation remove-item 0 Power-growth-memory-derivation ]
-      
-      set power-memory lput power power-memory
-      set Power-growth-memory lput power-growth Power-growth-memory
-      set Power-growth-memory-derivation lput power-growth-growth Power-growth-memory-derivation
-      
-      let mean-growth mean Power-growth-memory
-      let mean-growth-derivation mean Power-growth-memory-derivation
-      
-      let mean-growth-abs abs mean-growth
-      let mean-growth-derivation-abs abs mean-growth-derivation
-      
-      
-      if (ticks > (memory-length)) [
-        ifelse  ( mean-growth-abs <= inflection-point-deviation-zero) [
-          set inflectionpoint-category 1
+  ask patches with [water = false][
+    let change-in_GDPpercapita-growth random-normal 0 0.01
+    set GDPpercapita-growth (GDPpercapita-growth + change-in_GDPpercapita-growth) 
+    let change-in_Population-growth population-GDP-factor * change-in_GDPpercapita-growth
+    set Population-growth Population-growth + change-in_Population-growth
+    set patch-population (patch-population * Population-growth)
+    set patch-GDPperCapita (patch-GDPperCapita * GDPpercapita-growth)    
+    set economic-size (patch-population * patch-GDPperCapita)
+    if ( patch-population < 0) [set patch-population 0]
+    if ( patch-GDPperCapita < 0) [set patch-GDPperCapita 0]
+  ]
   
-        ]
-        [ 
-          ifelse  ( mean-growth-derivation-abs <= inflection-point-deviation-zero) [ 
-            ifelse (mean-growth > 0)
+  
+  
+  ask states [ ;; update variables with endogeneous growth, set total values of import and export, set internal resource allocations
+    set my-provinces patches with [my-state = myself]
+    set count-provinces count my-provinces
+    set ExportSize sum [tradevolume] of my-out-exports
+    set ImportSize sum [tradevolume] of my-in-exports
+    
+    carefully [set GDP-E+I (sum [ economic-size] of my-provinces) ] [set GDP-E+I GDP-E+I  ]
+    carefully [set GDP GDP-E+I + Exportsize - Importsize] [set GDP GDP]
+    if (GDP <= 0) [ set GDP 1 ]
+    carefully [set Population (sum [patch-population] of my-provinces)] [ set population population ]
+    if (Population <= 0) [ set Population 1 ]
+    set GDPpercapita GDP / population
+    carefully [set technological-advancement GDPpercapita / mean-GDP-cap] [ set technological-advancement 1]
+    
+    let normal random-normal mean-military-spending SD-military-spending
+    let senseofsecurity-effects 1
+    carefully [ifelse (1 / senseofsecurity > 3) [set senseofsecurity-effects 3][set senseofsecurity-effects (1 / senseofsecurity)]] [set senseofsecurity-effects 0 ] ;; high sense of security means lower militar spending
+    let compensation-current-size (fighting-strength / GDP)
+    let increase 0
+    if ( Decision-spending = true ) [ set increase increased-mil-spending set Decision-spending false]
+    
+    let change senseofsecurity-effects - compensation-current-size
+    set MilitarySpending (1 + increase) + normal + (change / 5)
+    carefully [set MilitaryCapabilities (MilitaryCapabilities * MilitarySpending)] [ set MilitaryCapabilities MilitaryCapabilities]
+    if (MilitaryCapabilities <= 0) [ 
+      ifelse (change < 0) [
+        set MilitaryCapabilities 0 ]
+      [
+        set MilitaryCapabilities change
+      ]]    
+    
+    set fighting-strength technological-advancement * MilitaryCapabilities
+    
+    setup-globals
+    
+    let old-growth 0
+    let power-growth 0
+    let power-growth-growth 0
+    let old-power power
+    if (ticks > 1) [set old-growth last Power-growth-memory]
+    
+    set power set-power
+    
+    carefully [set power-growth ((power - old-power) / old-power)][set power-growth 0]
+    
+    carefully [ set power-growth-growth ((power-growth - old-growth) / old-growth)] [set power-growth-growth 0]
+    
+    if (length power-memory >= memory-length) [ set power-memory remove-item 0 power-memory ]
+    if (length Power-growth-memory >= memory-length) [ set Power-growth-memory remove-item 0 Power-growth-memory ]
+    if (length Power-growth-memory-derivation >= memory-length) [ set Power-growth-memory-derivation remove-item 0 Power-growth-memory-derivation ]
+    
+    set power-memory lput power power-memory
+    set Power-growth-memory lput power-growth Power-growth-memory
+    set Power-growth-memory-derivation lput power-growth-growth Power-growth-memory-derivation
+    
+    let mean-growth mean Power-growth-memory
+    let mean-growth-derivation mean Power-growth-memory-derivation
+    
+    let mean-growth-abs abs mean-growth
+    let mean-growth-derivation-abs abs mean-growth-derivation
+    
+    
+    if (ticks > (memory-length)) [
+      ifelse  ( mean-growth-abs <= inflection-point-deviation-zero) [
+        set inflectionpoint-category 1
+        
+      ]
+      [ 
+        ifelse  ( mean-growth-derivation-abs <= inflection-point-deviation-zero) [ 
+          ifelse (mean-growth > 0)
             [set inflectionpoint-category 3 ]
             [set inflectionpoint-category 6 ]
-          ]
-          [
-            ifelse (mean-growth > 0) 
+        ]
+        [
+          ifelse (mean-growth > 0) 
             [ifelse (mean-growth-derivation >= 0)
               [set inflectionpoint-category 2 ]
               [set inflectionpoint-category 4 ]
@@ -461,62 +461,62 @@ to update-attributes ;; endogenous growth of variables since last tick
               [set inflectionpoint-category 7 ]
               [set inflectionpoint-category 5 ]
             ]]]
-        if ( inflectionpoint-category = 0 ) [ show mean-growth show mean-growth-derivation]
-      ]
+      if ( inflectionpoint-category = 0 ) [ show mean-growth show mean-growth-derivation]
+    ]
+    
+    
+    
+    set resource-allocation [resource-type] of my-provinces with [resource-present? = true]
+    set resource-allocation remove-duplicates resource-allocation
+    set Invaluable-partners remove-duplicates Invaluable-partners
+    
+    set Major-Power? false
+    
+    if (any? states with [power > Threshold-major-power ]) [ ask states with [power > Threshold-major-power ] [set Major-Power? true ]] 
+    
+    if (ticks > memory-length) [
+      let mean-FPR mean [FPR-satisfaction] of states
+      set w1 (uw1 + FPR-impact * (FPR-satisfaction - mean-FPR))
+      set w2 (uw2 - FPR-impact * (FPR-satisfaction + mean-FPR))
       
-      
-      
-      set resource-allocation [resource-type] of my-provinces with [resource-present? = true]
-      set resource-allocation remove-duplicates resource-allocation
-      set Invaluable-partners remove-duplicates Invaluable-partners
-      
-      set Major-Power? false
-      
-      if (any? states with [power > Threshold-major-power ]) [ ask states with [power > Threshold-major-power ] [set Major-Power? true ]] 
-      
-      if (ticks > memory-length) [
-        let mean-FPR mean [FPR-satisfaction] of states
-        set w1 (uw1 + FPR-impact * (FPR-satisfaction - mean-FPR))
-        set w2 (uw2 - FPR-impact * (FPR-satisfaction + mean-FPR))
-        
-        if (w1 < 0) [ set w1 0]
-        if (w2 < 0) [ set w2 0]
-      ]
-      
-      if (any? alliance-neighbors) [
-        let potentials [who] of alliance-neighbors
-        foreach potentials [
-          if ([attitude < 5] of diplomaticrelation ? who) [
-            ask alliance ? who [ die ]
-          ]]]
-      
-      ifelse (any? my-DiplomaticRelations with [attitude >= 5]) [
-        let friendly-links my-DiplomaticRelations with [attitude >= 5]
-        set friendly-states [other-end] of friendly-links]
-      [ set friendly-states []]
-      
-      if ( (random 1000 < (amount_of_ideology_change * 1000)) AND friendly-states != []) [
-        let x one-of friendly-states
-        let choice random (Length_of_culture_list - 1)
-        let value item choice ([ideology] of x)
-        let own-value item choice ideology
-        if ( own-value != value) [
-          ifelse ( own-value > value)
+      if (w1 < 0) [ set w1 0]
+      if (w2 < 0) [ set w2 0]
+    ]
+    
+    if (any? alliance-neighbors) [
+      let potentials [who] of alliance-neighbors
+      foreach potentials [
+        if ([attitude < 5] of diplomaticrelation ? who) [
+          ask alliance ? who [ die ]
+        ]]]
+    
+    ifelse (any? my-DiplomaticRelations with [attitude >= 5]) [
+      let friendly-links my-DiplomaticRelations with [attitude >= 5]
+      set friendly-states [other-end] of friendly-links]
+    [ set friendly-states []]
+    
+    if ( (random 1000 < (amount_of_ideology_change * 1000)) AND friendly-states != []) [
+      let x one-of friendly-states
+      let choice random (Length_of_culture_list - 1)
+      let value item choice ([ideology] of x)
+      let own-value item choice ideology
+      if ( own-value != value) [
+        ifelse ( own-value > value)
           [ set ideology (replace-item choice ideology (own-value - 1)) ] 
           [ set ideology (replace-item choice ideology (own-value + 1))]
-        ]
-        ask diplomaticrelation ([who] of x) who [ determine-similarity] 
-      ]]
-    
- 
+      ]
+      ask diplomaticrelation ([who] of x) who [ determine-similarity] 
+    ]]
   
-
-    ask Exports [ 
-      ;;let state-at-hand end2
-      let relevant-patches [my-provinces] of end2
-      carefully [let growth mean [GDPpercapita-growth] of relevant-patches set tradevolume tradevolume * growth][ die ]
-    ]  
-
+  
+  
+  
+  ask Exports [ 
+    ;;let state-at-hand end2
+    let relevant-patches [my-provinces] of end2
+    carefully [let growth mean [GDPpercapita-growth] of relevant-patches set tradevolume tradevolume * growth][ die ]
+  ]  
+  
 end
 
 to observe ;; identify threats, potential allies, etc.
@@ -551,8 +551,8 @@ to decide
           [  stop]
           
           carefully [if ( target-diplomaticrelation = nobody ) [ print "target-diplomaticrelation is nobody" stop]
-          if ( enemy = nobody ) [ print "enemy is nobody" stop]
-          if ( enemy = first-state ) [ print "state is dead" stop]] [ stop ]
+            if ( enemy = nobody ) [ print "enemy is nobody" stop]
+            if ( enemy = first-state ) [ print "state is dead" stop]] [ stop ]
           
           let chance-winning 0
           carefully [ set chance-winning pWinning self enemy nobody ] [ stop ]
@@ -598,9 +598,9 @@ to decide
           set submit-security find-senseofsecurity self enemy "submit"
           set nothing-security find-senseofsecurity self enemy "nothing"
           
-           
+          
           set choice-other ((1 - chance-winning) * uw1 * actual-reparations-factor * count my-provinces) - (chance-winning * uw2 * actual-reparations-factor * (count [my-provinces] of enemy))
-         
+          
           
           if ( choice-other < 0) [ 
             set actual-reparations-factor (actual-reparations-factor * (1 - give-in-compensation)) 
@@ -611,33 +611,33 @@ to decide
           
           
           
-            set expected-spoils actual-reparations-factor * (count [my-provinces] of enemy )
-            set expected-losses actual-reparations-factor * count my-provinces
+          set expected-spoils actual-reparations-factor * (count [my-provinces] of enemy )
+          set expected-losses actual-reparations-factor * count my-provinces
           
           let n/c 0
           carefully [set n/c (w1 * expected-spoils) / (w2 * expected-losses)] [ set n/c 2]        
           
-        If (n/c < threshold-deescalate) [
+          If (n/c < threshold-deescalate) [
             ask target-diplomaticrelation [ 
               ifelse (first-state = end1) 
               [set decision-first "de-escalate"][set decision-second "de-escalate"]]]   
+          
+          
+          
+          Ifelse (n/c > threshold-escalate) [          
             
-          
-          
-            Ifelse (n/c > threshold-escalate) [          
-              
-              ask target-diplomaticrelation [ 
-                ifelse (first-state = end1) 
+            ask target-diplomaticrelation [ 
+              ifelse (first-state = end1) 
                 [set decision-first "escalate"][set decision-second "escalate"]]]
-                   
+          
           
           
           [ifelse ( [counter-round] of target-diplomaticrelation >= threshold-counter ) [
-          
-              let u-fight w1 * chance-winning * expected-spoils - w2 * expected-losses * (1 - chance-winning) - w3 * military-losses - w4 * loss-of-trade-direct + w5 * fight-security
-              let u-submit w5 * submit-security + w2 * (actual-reparations-factor * (1 - give-in-compensation)) * count my-provinces
-              
-              ifelse ( u-fight > u-submit )
+            
+            let u-fight w1 * chance-winning * expected-spoils - w2 * expected-losses * (1 - chance-winning) - w3 * military-losses - w4 * loss-of-trade-direct + w5 * fight-security
+            let u-submit w5 * submit-security + w2 * (actual-reparations-factor * (1 - give-in-compensation)) * count my-provinces
+            
+            ifelse ( u-fight > u-submit )
               [ask target-diplomaticrelation [ set counter-round 0 ifelse (first-state = end1) [set decision-first "mobilise & fight"][set decision-second "mobilise & fight"]]]
               [ask target-diplomaticrelation [ set counter-round 0 ifelse (first-state = end1) [set decision-first "submit"][set decision-second "submit"]]]
             
@@ -645,38 +645,38 @@ to decide
           
           [ ifelse (chance-winning  < (1 - pWinning-factor)) [ ;; you're screwed, your only option is to get a major power to defend you
             
-              ifelse ( potential-allies != [] ) [ 
-                let max-chance-winning chance-winning
-                let alliance-choice nobody
-                foreach potential-allies [
-                  let chance-winning-alliance pWinning self enemy ?
-                  if ( chance-winning-alliance > max-chance-winning ) [
-                    set max-chance-winning chance-winning-alliance
-                    set alliance-choice ?]]
-                if (alliance-choice != nobody) [
-                  create-alliance-with alliance-choice
-                  ask target-diplomaticrelation [
-                    ifelse (first-state = end1) [set decision-first "alliance"][set decision-second "alliance"]
-                    set counter-round counter-round + 1]
-                ]]                                       
-              [
-                let u-fight w1 * chance-winning * expected-spoils - w2 * expected-losses * (1 - chance-winning) - w3 * military-losses - w4 * loss-of-trade-direct + w5 * fight-security
-                let u-submit w5 * submit-security + w2 * (actual-reparations-factor * (1 - give-in-compensation)) * count my-provinces
-                ifelse ( u-fight > u-submit )
+            ifelse ( potential-allies != [] ) [ 
+              let max-chance-winning chance-winning
+              let alliance-choice nobody
+              foreach potential-allies [
+                let chance-winning-alliance pWinning self enemy ?
+                if ( chance-winning-alliance > max-chance-winning ) [
+                  set max-chance-winning chance-winning-alliance
+                  set alliance-choice ?]]
+              if (alliance-choice != nobody) [
+                create-alliance-with alliance-choice
+                ask target-diplomaticrelation [
+                  ifelse (first-state = end1) [set decision-first "alliance"][set decision-second "alliance"]
+                  set counter-round counter-round + 1]
+              ]]                                       
+            [
+              let u-fight w1 * chance-winning * expected-spoils - w2 * expected-losses * (1 - chance-winning) - w3 * military-losses - w4 * loss-of-trade-direct + w5 * fight-security
+              let u-submit w5 * submit-security + w2 * (actual-reparations-factor * (1 - give-in-compensation)) * count my-provinces
+              ifelse ( u-fight > u-submit )
                 [ask target-diplomaticrelation [ ifelse (first-state = end1) [set decision-first "mobilise & fight"][set decision-second "mobilise & fight"]]]
                 [ifelse (count my-provinces <= 2) [ask target-diplomaticrelation [ ifelse (first-state = end1) [set decision-first "mobilise & fight"][set decision-second "mobilise & fight"]]]
                   [ask target-diplomaticrelation [ ifelse (first-state = end1) [set decision-first "submit"][set decision-second "submit"]]]]      
-              ]
             ]
+          ]
           
           [
             ifelse (chance-winning > pWinning-factor)
             [  ;; you're going to win, no need to worry. Try to extract some profit from the conflict.                 
               
-                let u-fight w1 * chance-winning * expected-spoils - w2 * expected-losses * (1 - chance-winning) - w3 * military-losses - w4 * loss-of-trade-direct + w5 * fight-security
-                let u-nothing w5 * nothing-security
-                
-                ifelse ( u-fight > u-nothing ) 
+              let u-fight w1 * chance-winning * expected-spoils - w2 * expected-losses * (1 - chance-winning) - w3 * military-losses - w4 * loss-of-trade-direct + w5 * fight-security
+              let u-nothing w5 * nothing-security
+              
+              ifelse ( u-fight > u-nothing ) 
                 [ask target-diplomaticrelation [ ifelse (first-state = end1) [set decision-first "mobilise & fight"][set decision-second "mobilise & fight"]]]
                 [ask target-diplomaticrelation [ ifelse (first-state = end1) [set decision-first "nothing"][set decision-second "nothing"]]]
               
@@ -717,7 +717,7 @@ to decide
                   ifelse (first-state = end1) [set decision-first "alliance"][set decision-second "alliance"]
                   set counter-round counter-round + 1]
               ]              
-            
+              
             ]]]]]]]]
 end
 
@@ -729,76 +729,76 @@ to interact
       if (decision-second != 0 AND decision-first = 0) [ set decision-second 0 ]     
       
       
-        if ( decision-first = "escalate" AND decision-second = "escalate" ) [ set decision-first 0 set decision-second 0  set conflict-level conflict-level + 1 if (conflict-level > 5) [ set conflict-level 5 set time-of-decision ticks set counter-round 0 set conflict false wage-war end1 end2 set type-of-last-conflict "armedconflict"  set decision-first 0 set decision-second 0 ]]
-        if ( decision-first = "escalate" AND decision-second = "mobilise & fight" ) [ set decision-first 0 set decision-second 0 set conflict-level conflict-level + 1 if (conflict-level > 5) [ set conflict-level 5 set time-of-decision ticks set counter-round 0 set conflict false wage-war end1 end2 set type-of-last-conflict "armedconflict" ]]
-        if ( decision-first = "mobilise & fight" AND decision-second = "escalate" ) [ set decision-first 0 set decision-second 0 set conflict-level conflict-level + 1 if (conflict-level > 5) [ set conflict-level 5 set time-of-decision ticks set counter-round 0 set conflict false wage-war end1 end2 set type-of-last-conflict "armedconflict" ]]
+      if ( decision-first = "escalate" AND decision-second = "escalate" ) [ set decision-first 0 set decision-second 0  set conflict-level conflict-level + 1 if (conflict-level > 5) [ set conflict-level 5 set time-of-decision ticks set counter-round 0 set conflict false wage-war end1 end2 set type-of-last-conflict "armedconflict"  set decision-first 0 set decision-second 0 ]]
+      if ( decision-first = "escalate" AND decision-second = "mobilise & fight" ) [ set decision-first 0 set decision-second 0 set conflict-level conflict-level + 1 if (conflict-level > 5) [ set conflict-level 5 set time-of-decision ticks set counter-round 0 set conflict false wage-war end1 end2 set type-of-last-conflict "armedconflict" ]]
+      if ( decision-first = "mobilise & fight" AND decision-second = "escalate" ) [ set decision-first 0 set decision-second 0 set conflict-level conflict-level + 1 if (conflict-level > 5) [ set conflict-level 5 set time-of-decision ticks set counter-round 0 set conflict false wage-war end1 end2 set type-of-last-conflict "armedconflict" ]]
+      
+      if ( decision-first = "de-escalate" AND decision-second = "de-escalate" ) [ set conflict-level conflict-level - 1 if (conflict-level < 1) [ set time-of-decision ticks set counter-round 0 set conflict false set type-of-last-conflict "submitted" set decision-first 0 set decision-second 0]]
+      if ( decision-first = "mobilise & fight" AND decision-second = "mobilise & fight" ) [set time-of-decision ticks set counter-round 0 set conflict false carefully [wage-war end1 end2] [print 51] set type-of-last-conflict "armedconflict"  set decision-first 0 set decision-second 0];; show "1"]
+      
+      if ((decision-first = "nothing" OR decision-first = "submit" OR decision-first = "de-escalate") AND (decision-second = "submit" OR decision-second = "nothing" OR decision-second = "de-escalate")) [
+        set time-of-decision ticks set counter-round 0 set conflict false set type-of-last-conflict "submitted" set decision-first 0 set decision-second 0]
+      if ((decision-first = "escalate" AND decision-second = "de-escalate") OR (decision-first = "de-escalate" AND decision-second = "escalate")) [
+        set counter-round counter-round + 1  set decision-first 0 set decision-second 0]
+      
+      
+      
+      
+      if (( decision-first = "mobilise & fight" AND decision-second = "militarycapabilities") OR (decision-first = "mobilise & fight" AND decision-second = "alliance") OR ( decision-first = "escalate" AND decision-second = "militarycapabilities" ) OR ( decision-first = "escalate" AND decision-second = "alliance" )) [ ;; states now have the choice: fight or submit
         
-        if ( decision-first = "de-escalate" AND decision-second = "de-escalate" ) [ set conflict-level conflict-level - 1 if (conflict-level < 1) [ set time-of-decision ticks set counter-round 0 set conflict false set type-of-last-conflict "submitted" set decision-first 0 set decision-second 0]]
-        if ( decision-first = "mobilise & fight" AND decision-second = "mobilise & fight" ) [set time-of-decision ticks set counter-round 0 set conflict false carefully [wage-war end1 end2] [print 51] set type-of-last-conflict "armedconflict"  set decision-first 0 set decision-second 0];; show "1"]
-      
-        if ((decision-first = "nothing" OR decision-first = "submit" OR decision-first = "de-escalate") AND (decision-second = "submit" OR decision-second = "nothing" OR decision-second = "de-escalate")) [
-          set time-of-decision ticks set counter-round 0 set conflict false set type-of-last-conflict "submitted" set decision-first 0 set decision-second 0]
-        if ((decision-first = "escalate" AND decision-second = "de-escalate") OR (decision-first = "de-escalate" AND decision-second = "escalate")) [
-          set counter-round counter-round + 1  set decision-first 0 set decision-second 0]
-    
-      
-      
-     
-        if (( decision-first = "mobilise & fight" AND decision-second = "militarycapabilities") OR (decision-first = "mobilise & fight" AND decision-second = "alliance") OR ( decision-first = "escalate" AND decision-second = "militarycapabilities" ) OR ( decision-first = "escalate" AND decision-second = "alliance" )) [ ;; states now have the choice: fight or submit
-          
-          set counter-round 0
-          set time-of-decision ticks
-          
-          let actual-reparations-factor actual-reparations
-          let actual-attrition-rate actual-attrition
-          
-          let expected-spoils actual-reparations-factor * count [my-provinces] of end1
-          let expected-losses actual-reparations-factor * count [my-provinces] of end2
-          let military-losses actual-attrition-rate * [fighting-strength] of end1
-          let loss-of-trade-direct interdependence end1 end2
-          ifelse ( pwinning end2 end1 nobody * expected-spoils - expected-losses * pwinning end2 end1 nobody - military-losses - loss-of-trade-direct > (actual-reparations-factor * (1 - give-in-compensation)) * count [my-provinces] of end2)
+        set counter-round 0
+        set time-of-decision ticks
+        
+        let actual-reparations-factor actual-reparations
+        let actual-attrition-rate actual-attrition
+        
+        let expected-spoils actual-reparations-factor * count [my-provinces] of end1
+        let expected-losses actual-reparations-factor * count [my-provinces] of end2
+        let military-losses actual-attrition-rate * [fighting-strength] of end1
+        let loss-of-trade-direct interdependence end1 end2
+        ifelse ( pwinning end2 end1 nobody * expected-spoils - expected-losses * pwinning end2 end1 nobody - military-losses - loss-of-trade-direct > (actual-reparations-factor * (1 - give-in-compensation)) * count [my-provinces] of end2)
           [ set time-of-decision ticks set counter-round 0 set conflict false wage-war end2 end1 set type-of-last-conflict "armedconflict"  set decision-first 0 set decision-second 0] 
           [set decision-second "submit" ]];; show "5" ] 
-     
       
       
-        if ((decision-second = "mobilise & fight" AND decision-first = "militarycapabilities") OR (decision-first = "alliance" AND decision-second = "mobilise & fight") OR ( decision-second = "escalate" AND decision-first = "militarycapabilities" ) OR ( decision-second = "escalate" AND decision-first = "alliance" )) [ 
-          
-          set counter-round 0
-          set time-of-decision ticks
-          let actual-reparations-factor actual-reparations
-          let actual-attrition-rate actual-attrition
-          let expected-spoils actual-reparations-factor * count [my-provinces] of end2
-          let expected-losses actual-reparations-factor * count [my-provinces] of end1
-          let military-losses actual-attrition-rate * [fighting-strength] of end2
-          let loss-of-trade-direct interdependence end2 end1
-          ifelse ( pwinning end1 end2 nobody * expected-spoils - expected-losses * pwinning end1 end2 nobody - military-losses - loss-of-trade-direct > (actual-reparations-factor * (1 - give-in-compensation)) * count [my-provinces] of end1)
+      
+      if ((decision-second = "mobilise & fight" AND decision-first = "militarycapabilities") OR (decision-first = "alliance" AND decision-second = "mobilise & fight") OR ( decision-second = "escalate" AND decision-first = "militarycapabilities" ) OR ( decision-second = "escalate" AND decision-first = "alliance" )) [ 
+        
+        set counter-round 0
+        set time-of-decision ticks
+        let actual-reparations-factor actual-reparations
+        let actual-attrition-rate actual-attrition
+        let expected-spoils actual-reparations-factor * count [my-provinces] of end2
+        let expected-losses actual-reparations-factor * count [my-provinces] of end1
+        let military-losses actual-attrition-rate * [fighting-strength] of end2
+        let loss-of-trade-direct interdependence end2 end1
+        ifelse ( pwinning end1 end2 nobody * expected-spoils - expected-losses * pwinning end1 end2 nobody - military-losses - loss-of-trade-direct > (actual-reparations-factor * (1 - give-in-compensation)) * count [my-provinces] of end1)
           [  set time-of-decision ticks set counter-round 0 set conflict false wage-war end1 end2 set type-of-last-conflict "armedconflict"  set decision-first 0 set decision-second 0] 
           [set decision-first "submit" ]];; show "6"]
-     
       
-     
-        if ((decision-first = "mobilise & fight" AND decision-second = "submit") OR (decision-first = "mobilise & fight" AND decision-second = "nothing") OR (decision-first = "mobilise & fight" AND decision-second = "de-escalate")) [ 
-           set time-of-decision ticks set conflict false structural-change end1 end2 "submit" set type-of-last-conflict "bargaining" set decision-first 0 set decision-second 0];; show "3"]
-        if (decision-second = "mobilise & fight" AND decision-first = "submit" OR (decision-second = "mobilise & fight" AND decision-first = "nothing") OR (decision-second = "mobilise & fight" AND decision-first = "de-escalate")) [ 
-           set time-of-decision ticks set conflict false structural-change end2 end1 "submit" set type-of-last-conflict "bargaining" set decision-first 0 set decision-second 0];; show "4" ] 
-
+      
+      
+      if ((decision-first = "mobilise & fight" AND decision-second = "submit") OR (decision-first = "mobilise & fight" AND decision-second = "nothing") OR (decision-first = "mobilise & fight" AND decision-second = "de-escalate")) [ 
+        set time-of-decision ticks set conflict false structural-change end1 end2 "submit" set type-of-last-conflict "bargaining" set decision-first 0 set decision-second 0];; show "3"]
+      if (decision-second = "mobilise & fight" AND decision-first = "submit" OR (decision-second = "mobilise & fight" AND decision-first = "nothing") OR (decision-second = "mobilise & fight" AND decision-first = "de-escalate")) [ 
+        set time-of-decision ticks set conflict false structural-change end2 end1 "submit" set type-of-last-conflict "bargaining" set decision-first 0 set decision-second 0];; show "4" ] 
+      
       
       if (decision-first = "submit" AND decision-second = "militarycapabilities" OR (decision-second = "militarycapabilities" AND decision-first = "nothing") OR (decision-second = "militarycapabilities" AND decision-first = "de-escalate")) [
         set counter-round counter-round + 1  set decision-first 0 set decision-second 0];; show "7"] 
       if (decision-second = "submit" AND decision-first = "militarycapabilities" OR (decision-first = "militarycapabilities" AND decision-second = "nothing") OR (decision-first = "militarycapabilities" AND decision-second = "de-escalate")) [ 
-         set counter-round counter-round + 1  set decision-first 0 set decision-second 0];; show "8"]
+        set counter-round counter-round + 1  set decision-first 0 set decision-second 0];; show "8"]
       
       
-        if ( (decision-first = "militarycapabilities" ) AND (decision-second = "militarycapabilities" )) [
-          set counter-round counter-round + 1
-          set decision-first 0 set decision-second 0
-          if ( is-state? end1 = true) [
-            ask end1 [ set Decision-spending true ]]        
-          if ( is-state? end2 = true) [
-            ask end2 [set Decision-spending true]]]
-        
-   
+      if ( (decision-first = "militarycapabilities" ) AND (decision-second = "militarycapabilities" )) [
+        set counter-round counter-round + 1
+        set decision-first 0 set decision-second 0
+        if ( is-state? end1 = true) [
+          ask end1 [ set Decision-spending true ]]        
+        if ( is-state? end2 = true) [
+          ask end2 [set Decision-spending true]]]
+      
+      
       
       if ( decision-first = "de-escalate" AND decision-second != "escalate" AND decision-second != "de-escalate" AND decision-second != "nothing") [ set decision-first "submit"]
       if ( decision-second = "de-escalate" AND decision-first != "escalate" AND decision-first != "de-escalate" AND decision-first != "nothing") [  set decision-second "submit"]
@@ -820,23 +820,23 @@ to interact
       if (decision-second = "escalate" AND decision-first = "nothing") [set decision-first 0 set decision-second 0 set counter-round counter-round + 1 ]
       
       
-     
-        if (decision-first = "alliance" AND decision-second = "militarycapabilities" AND is-state? end2 = true) [set counter-round counter-round + 1 ask end2 [ set Decision-spending true ] set decision-first 0 set decision-second 0]
-        if (decision-second = "alliance" AND decision-first = "militarycapabilities" AND is-state? end1 = true) [set counter-round counter-round + 1 ask end1 [ set Decision-spending true ] set decision-first 0 set decision-second 0]
-        if (decision-first = "alliance" AND decision-second = "alliance") [set counter-round counter-round + 1 set decision-first 0 set decision-second 0]
-        
-        if ((decision-first = "alliance" AND decision-second = "submit") OR (decision-first = "alliance" AND decision-second = "nothing") OR (decision-first = "alliance" AND decision-second = "de-escalate")) [
-          set counter-round counter-round + 1  set decision-first 0 set decision-second 0]
-        if ((decision-second = "alliance" AND decision-first = "submit") OR (decision-second = "alliance" AND decision-first = "nothing") OR (decision-second = "alliance" AND decision-first = "de-escalate")) [
-          set counter-round counter-round + 1  set decision-first 0 set decision-second 0]
-   
+      
+      if (decision-first = "alliance" AND decision-second = "militarycapabilities" AND is-state? end2 = true) [set counter-round counter-round + 1 ask end2 [ set Decision-spending true ] set decision-first 0 set decision-second 0]
+      if (decision-second = "alliance" AND decision-first = "militarycapabilities" AND is-state? end1 = true) [set counter-round counter-round + 1 ask end1 [ set Decision-spending true ] set decision-first 0 set decision-second 0]
+      if (decision-first = "alliance" AND decision-second = "alliance") [set counter-round counter-round + 1 set decision-first 0 set decision-second 0]
+      
+      if ((decision-first = "alliance" AND decision-second = "submit") OR (decision-first = "alliance" AND decision-second = "nothing") OR (decision-first = "alliance" AND decision-second = "de-escalate")) [
+        set counter-round counter-round + 1  set decision-first 0 set decision-second 0]
+      if ((decision-second = "alliance" AND decision-first = "submit") OR (decision-second = "alliance" AND decision-first = "nothing") OR (decision-second = "alliance" AND decision-first = "de-escalate")) [
+        set counter-round counter-round + 1  set decision-first 0 set decision-second 0]
+      
       if ( decision-first != 0 OR decision-second != 0) [ show decision-first show decision-second  set decision-first 0 set decision-second 0]
     ]]   
 end
 
 to wage-war [ #first #second ];; fight wars etc.
-  if ( is-state? #first = true AND is-state? #second = true) [
-    
+  
+  if ( is-state? #first = true AND is-state? #second = true) [    
     set war-counter war-counter + 1                           
     let winner nobody
     let loser nobody 
@@ -846,102 +846,102 @@ to wage-war [ #first #second ];; fight wars etc.
     let second-alliance-power [fighting-strength] of #second + sum [fighting-strength] of second-alliance
     
     
-      if (any? states with [member? self second-alliance AND member? self first-alliance]) [
-        ask states with [member? self second-alliance AND member? self first-alliance] [ ask alliance who [who] of #first [ die ]]
-      ]
-   
+    if (any? states with [member? self second-alliance AND member? self first-alliance]) [
+      ask states with [member? self second-alliance AND member? self first-alliance] [ ask alliance who [who] of #first [ die ]]
+    ]
+    
     
     let pWinningFirst 0
     let pWinningSecond 0
-  
-      set pWinningFirst pwinning #first #second nobody  
-      set pWinningSecond pwinning #second #first nobody 
-
+    
+    set pWinningFirst pwinning #first #second nobody  
+    set pWinningSecond pwinning #second #first nobody 
+    
     
     ifelse ( pWinningFirst > pWinningSecond ) [ set winner #first set loser #second] [set winner #second set loser #first]
     ;; generate battle damage
     
-   
-      if ([Power > threshold-major-power] of #first AND [Power > threshold-major-power] of #second)[ 
-        let counter1 count [alliance-neighbors with [Power > threshold-major-power]] of #first
-        let counter2 count [alliance-neighbors with [Power > threshold-major-power]] of #second
-        set-output #first #second
-        set multiple-MP1 lput (1 + counter1) multiple-MP1
-        set multiple-MP2 lput (1 + counter2) multiple-MP2      
-      ]
-      
-      if ([Power > threshold-major-power] of #first AND any? [alliance-neighbors with [Power > threshold-major-power]] of #second) [ 
-        let counter1 count [alliance-neighbors with [Power > threshold-major-power]] of #first
-        let counter2 count [alliance-neighbors with [Power > threshold-major-power]] of #second
-        let relevant-state nobody
-        set relevant-state one-of [alliance-neighbors with [Power > threshold-major-power]] of #second
-        set-output #first relevant-state
-        set multiple-MP1 lput (1 + counter1) multiple-MP1
-        set multiple-MP2 lput counter2 multiple-MP2 
-      ]
-      
-      if (any? [alliance-neighbors  with [Power > threshold-major-power]] of #first AND [Power > threshold-major-power] of #second )[
-        let counter1 count [alliance-neighbors with [Power > threshold-major-power]] of #first
-        let counter2 count [alliance-neighbors with [Power > threshold-major-power]] of #second
-        let relevant-state nobody
-        set relevant-state one-of [alliance-neighbors with [Power > threshold-major-power]] of #first
-        set-output #second relevant-state
-        set multiple-MP1 lput counter1 multiple-MP1
-        set multiple-MP2 lput (1 + counter2) multiple-MP2 
-      ]
-      
-      if ( any? [alliance-neighbors  with [Power > threshold-major-power]] of #first  AND any? [alliance-neighbors with [Power > threshold-major-power]] of #second)[
-        let counter1 count [alliance-neighbors with [Power > threshold-major-power]] of #first
-        let counter2 count [alliance-neighbors with [Power > threshold-major-power]] of #second
-        let relevant-state1 nobody
-        let relevant-state2 nobody
-        set relevant-state1 one-of [alliance-neighbors with [Power > threshold-major-power]] of #first
-        set relevant-state2 one-of [alliance-neighbors with [Power > threshold-major-power]] of #second        
-        set-output relevant-state1 relevant-state2
-        set multiple-MP1 lput counter1 multiple-MP1
-        set multiple-MP2 lput counter2 multiple-MP2 
-      ]
-      
+    
+    if ([Power > threshold-major-power] of #first AND [Power > threshold-major-power] of #second)[ 
+      let counter1 count [alliance-neighbors with [Power > threshold-major-power]] of #first
+      let counter2 count [alliance-neighbors with [Power > threshold-major-power]] of #second
+      set-output #first #second
+      set multiple-MP1 lput (1 + counter1) multiple-MP1
+      set multiple-MP2 lput (1 + counter2) multiple-MP2      
+    ]
+    
+    if ([Power > threshold-major-power] of #first AND any? [alliance-neighbors with [Power > threshold-major-power]] of #second) [ 
+      let counter1 count [alliance-neighbors with [Power > threshold-major-power]] of #first
+      let counter2 count [alliance-neighbors with [Power > threshold-major-power]] of #second
+      let relevant-state nobody
+      set relevant-state one-of [alliance-neighbors with [Power > threshold-major-power]] of #second
+      set-output #first relevant-state
+      set multiple-MP1 lput (1 + counter1) multiple-MP1
+      set multiple-MP2 lput counter2 multiple-MP2 
+    ]
+    
+    if (any? [alliance-neighbors  with [Power > threshold-major-power]] of #first AND [Power > threshold-major-power] of #second )[
+      let counter1 count [alliance-neighbors with [Power > threshold-major-power]] of #first
+      let counter2 count [alliance-neighbors with [Power > threshold-major-power]] of #second
+      let relevant-state nobody
+      set relevant-state one-of [alliance-neighbors with [Power > threshold-major-power]] of #first
+      set-output #second relevant-state
+      set multiple-MP1 lput counter1 multiple-MP1
+      set multiple-MP2 lput (1 + counter2) multiple-MP2 
+    ]
+    
+    if ( any? [alliance-neighbors  with [Power > threshold-major-power]] of #first  AND any? [alliance-neighbors with [Power > threshold-major-power]] of #second)[
+      let counter1 count [alliance-neighbors with [Power > threshold-major-power]] of #first
+      let counter2 count [alliance-neighbors with [Power > threshold-major-power]] of #second
+      let relevant-state1 nobody
+      let relevant-state2 nobody
+      set relevant-state1 one-of [alliance-neighbors with [Power > threshold-major-power]] of #first
+      set relevant-state2 one-of [alliance-neighbors with [Power > threshold-major-power]] of #second        
+      set-output relevant-state1 relevant-state2
+      set multiple-MP1 lput counter1 multiple-MP1
+      set multiple-MP2 lput counter2 multiple-MP2 
+    ]
     
     
     
-      ask #first [
-        if (in-export-from #second != nobody)[
-          ask in-export-from #second [die]]
-        if (out-export-to #second != nobody)[
-          ask out-export-to #second [die]]]
-   
+    
+    ask #first [
+      if (in-export-from #second != nobody)[
+        ask in-export-from #second [die]]
+      if (out-export-to #second != nobody)[
+        ask out-export-to #second [die]]]
+    
     
     let actual-attritionrate 0
     
-      ask diplomaticrelation [who] of #first [who] of #second [ set actual-attritionrate actual-attrition ]    
-  
+    ask diplomaticrelation [who] of #first [who] of #second [ set actual-attritionrate actual-attrition ]    
+    
     
     let new-first-alliance-power first-alliance-power - actual-attritionrate * second-alliance-power
     let new-second-alliance-power second-alliance-power - actual-attritionrate * first-alliance-power
     
-
-      ask #first [ 
-        let powershare 0
-        carefully [set powershare fighting-strength / first-alliance-power] [ set powershare 1 ]
-        set militarycapabilities powershare * new-first-alliance-power
-      ]
-      ask first-alliance [ 
-        let powershare 0
-        carefully [set powershare fighting-strength / first-alliance-power] [ set powershare 1 ]
-        set militarycapabilities powershare * new-first-alliance-power
-      ]
-      
-      ask #second [
-        let powershare 0
-        carefully [set powershare fighting-strength / second-alliance-power] [ set powershare 1 ]
-        set militarycapabilities powershare * new-second-alliance-power]
-      
-      ask second-alliance [
-        let powershare 0
-        carefully [set powershare fighting-strength / second-alliance-power] [ set powershare 1 ]
-        set militarycapabilities powershare * new-second-alliance-power]
- 
+    
+    ask #first [ 
+      let powershare 0
+      carefully [set powershare fighting-strength / first-alliance-power] [ set powershare 1 ]
+      set militarycapabilities powershare * new-first-alliance-power
+    ]
+    ask first-alliance [ 
+      let powershare 0
+      carefully [set powershare fighting-strength / first-alliance-power] [ set powershare 1 ]
+      set militarycapabilities powershare * new-first-alliance-power
+    ]
+    
+    ask #second [
+      let powershare 0
+      carefully [set powershare fighting-strength / second-alliance-power] [ set powershare 1 ]
+      set militarycapabilities powershare * new-second-alliance-power]
+    
+    ask second-alliance [
+      let powershare 0
+      carefully [set powershare fighting-strength / second-alliance-power] [ set powershare 1 ]
+      set militarycapabilities powershare * new-second-alliance-power]
+    
     
     ;; call structural change to distribute spoils
     structural-change winner loser "war"
@@ -975,7 +975,7 @@ to structural-change [ #winner #loser #type ] ;; update landscape according to t
   if (#type = "submit") [
     set total-spoilsize round ((actual-reparations-factor * (1 - give-in-compensation)) * total-provinces)]
   if (total-spoilsize = 0 ) [ set total-spoilsize 1]
-    
+  
   let victors []
   set victors lput #winner victors
   ask [alliance-neighbors] of #winner [ set victors lput self victors ]
@@ -986,7 +986,7 @@ to structural-change [ #winner #loser #type ] ;; update landscape according to t
   ask [alliance-neighbors] of #loser [ set losers lput self losers ]
   ;;show losers
   let counter-spoilsize total-spoilsize
-    
+  
   if (length victors = 1 AND length losers = 1)[
     repeat total-spoilsize [
       ifelse (any? patches with [ my-state = #loser AND capital? = false and any? neighbors4 with [my-state = #winner]] )
@@ -1065,117 +1065,117 @@ to change-traderelations
     let amount-resources 0
     let updated-list []
     carefully [ set amount-resources length resource-allocation ] [ set amount-resources 0]
-  
-      if ( amount-resources < 5 )[ ;; not all resources are present within territory of the state
-        let missing-list [1 2 3 4 5]
-        let all-resources []
-        ifelse (any? in-export-neighbors) [set tradingpartners [other-end] of my-in-exports
-          foreach tradingpartners [
-            set all-resources lput [resource-allocation] of ? all-resources]]
-        [set tradingpartners []]
-        
-        if ( all-resources != []) [ 
-          set all-resources flatten all-resources 
-          set all-resources remove-duplicates all-resources
-          foreach all-resources [ 
-            set missing-list remove ? missing-list ]]
-        if (amount-resources != 0) [
-          foreach resource-allocation [ 
-            set missing-list remove ? missing-list ]]
-        let amount-missing 0
-        carefully [ set amount-missing length missing-list ] [ set amount-missing 0]
-        if (missing-list = 0) [set amount-missing 0]
-        
-        if ( amount-missing > 0 )[
-          foreach missing-list [
-            if (? != 0)[
-              if ( any? states with [ member? ? resource-allocation ]) [ 
-                let potentials [who] of states with [ member? ? resource-allocation ] 
-                let amount 0
-                carefully [ set amount length potentials] [ set amount 0]
-                ifelse (amount = 1 ) [ ;; you have no choice but to forge a trade relationship with this state
-                  create-export-to state item 0 potentials [set tradevolume random-normal mean-initial-trade-volume SD-initial-trade-volume show-link] ;;hide-link] 
-                create-export-from state item 0 potentials [set tradevolume random-normal mean-initial-trade-volume SD-initial-trade-volume show-link] ;;hide-link]
-                set Invaluable-partners lput item 0 potentials Invaluable-partners
-                ] 
-                [ let choice nobody
-                  let choice-utility -10000000
-                  foreach potentials [
-                    let otherstate one-of states with [who = ?]
-                    let attitude-aspect [attitude] of diplomaticrelation who [who] of otherstate
-                    let distance-aspect distance otherstate
-                    let cost distance-aspect * cost-per-distance + cost-of-new-trade
-                    let utility attitude-aspect - cost
-                    if ( utility > choice-utility ) [
-                      set choice otherstate
-                      set choice-utility utility]       
-                  ]
-                  create-export-to choice [set tradevolume random-normal mean-initial-trade-volume SD-initial-trade-volume hide-link] 
-                  create-export-from choice [set tradevolume random-normal mean-initial-trade-volume SD-initial-trade-volume hide-link]
-                ]]
-              set updated-list lput ? updated-list
-              
-            ]]]
-        
-        ;;set missing-list (map - missing-list updated-list)
-        if ( missing-list != [] AND missing-list != 0) [ 
-          foreach updated-list [ 
-            carefully [ set missing-list remove ? missing-list] []
-          ]]
-        
-        
-      ]
+    
+    if ( amount-resources < 5 )[ ;; not all resources are present within territory of the state
+      let missing-list [1 2 3 4 5]
+      let all-resources []
+      ifelse (any? in-export-neighbors) [set tradingpartners [other-end] of my-in-exports
+        foreach tradingpartners [
+          set all-resources lput [resource-allocation] of ? all-resources]]
+      [set tradingpartners []]
+      
+      if ( all-resources != []) [ 
+        set all-resources flatten all-resources 
+        set all-resources remove-duplicates all-resources
+        foreach all-resources [ 
+          set missing-list remove ? missing-list ]]
+      if (amount-resources != 0) [
+        foreach resource-allocation [ 
+          set missing-list remove ? missing-list ]]
+      let amount-missing 0
+      carefully [ set amount-missing length missing-list ] [ set amount-missing 0]
+      if (missing-list = 0) [set amount-missing 0]
+      
+      if ( amount-missing > 0 )[
+        foreach missing-list [
+          if (? != 0)[
+            if ( any? states with [ member? ? resource-allocation ]) [ 
+              let potentials [who] of states with [ member? ? resource-allocation ] 
+              let amount 0
+              carefully [ set amount length potentials] [ set amount 0]
+              ifelse (amount = 1 ) [ ;; you have no choice but to forge a trade relationship with this state
+                create-export-to state item 0 potentials [set tradevolume random-normal mean-initial-trade-volume SD-initial-trade-volume show-link] ;;hide-link] 
+              create-export-from state item 0 potentials [set tradevolume random-normal mean-initial-trade-volume SD-initial-trade-volume show-link] ;;hide-link]
+              set Invaluable-partners lput item 0 potentials Invaluable-partners
+              ] 
+              [ let choice nobody
+                let choice-utility -10000000
+                foreach potentials [
+                  let otherstate one-of states with [who = ?]
+                  let attitude-aspect [attitude] of diplomaticrelation who [who] of otherstate
+                  let distance-aspect distance otherstate
+                  let cost distance-aspect * cost-per-distance + cost-of-new-trade
+                  let utility attitude-aspect - cost
+                  if ( utility > choice-utility ) [
+                    set choice otherstate
+                    set choice-utility utility]       
+                ]
+                create-export-to choice [set tradevolume random-normal mean-initial-trade-volume SD-initial-trade-volume hide-link] 
+                create-export-from choice [set tradevolume random-normal mean-initial-trade-volume SD-initial-trade-volume hide-link]
+              ]]
+            set updated-list lput ? updated-list
+            
+          ]]]
+      
+      ;;set missing-list (map - missing-list updated-list)
+      if ( missing-list != [] AND missing-list != 0) [ 
+        foreach updated-list [ 
+          carefully [ set missing-list remove ? missing-list] []
+        ]]
+      
+      
+    ]
     
     
     let unprofitable-trades []
     set tradingpartners [other-end] of my-in-exports
-
-      if (tradingpartners != 0 AND tradingpartners != []) [
-        foreach tradingpartners [ 
-          let exportshare 0 
-          let importshare 0
-          if (in-export-from ? = true)[
-            set importshare [tradevolume] of in-export-from ?]
-          if ( out-export-to ? = true)[
-            set exportshare [tradevolume] of out-export-to ?]
-          if ( importshare > exportshare ) [ set unprofitable-trades lput ? unprofitable-trades ]
-        ]]
-
-      ifelse (any? my-DiplomaticRelations with [attitude < 5]) [
-        let hostile-links my-DiplomaticRelations with [attitude < 5]
-        set hostile-states [other-end] of hostile-links ]
-      [ set hostile-states []]
-
     
-
-      foreach friendly-states [ 
-        set unprofitable-trades remove ? unprofitable-trades ] ;; just the hostile nations are left now
-
+    if (tradingpartners != 0 AND tradingpartners != []) [
+      foreach tradingpartners [ 
+        let exportshare 0 
+        let importshare 0
+        if (in-export-from ? = true)[
+          set importshare [tradevolume] of in-export-from ?]
+        if ( out-export-to ? = true)[
+          set exportshare [tradevolume] of out-export-to ?]
+        if ( importshare > exportshare ) [ set unprofitable-trades lput ? unprofitable-trades ]
+      ]]
     
-
-      if (empty? Invaluable-partners = false AND Invaluable-partners != 0) [
-        foreach Invaluable-partners [
-          set unprofitable-trades remove ? unprofitable-trades ]]
-      if ( empty? unprofitable-trades = false ) [ 
-        foreach unprofitable-trades [
-          
-
-          ask export [who] of self [who] of ? [ die ]
-          ask export [who] of ? [who] of self [ die ]
-        ]
+    ifelse (any? my-DiplomaticRelations with [attitude < 5]) [
+      let hostile-links my-DiplomaticRelations with [attitude < 5]
+      set hostile-states [other-end] of hostile-links ]
+    [ set hostile-states []]
+    
+    
+    
+    foreach friendly-states [ 
+      set unprofitable-trades remove ? unprofitable-trades ] ;; just the hostile nations are left now
+    
+    
+    
+    if (empty? Invaluable-partners = false AND Invaluable-partners != 0) [
+      foreach Invaluable-partners [
+        set unprofitable-trades remove ? unprofitable-trades ]]
+    if ( empty? unprofitable-trades = false ) [ 
+      foreach unprofitable-trades [
+        
+        
+        ask export [who] of self [who] of ? [ die ]
+        ask export [who] of ? [who] of self [ die ]
       ]
-
-
-      foreach friendly-states [ 
-        if (? != nobody) [
-          let trade-distance distance ?
-          if ( member? ? tradingpartners = false ) [ 
-            create-export-to ? [set tradevolume random-normal mean-initial-trade-volume SD-initial-trade-volume hide-link] 
-          create-export-from ? [set tradevolume random-normal mean-initial-trade-volume SD-initial-trade-volume hide-link]
-          ask diplomaticrelation [who] of ? who [ set attitude attitude * (1 + attitude-trade-increase) ]
-          ]]]
-      set tradingpartners [other-end] of my-in-exports
-
+    ]
+    
+    
+    foreach friendly-states [ 
+      if (? != nobody) [
+        let trade-distance distance ?
+        if ( member? ? tradingpartners = false ) [ 
+          create-export-to ? [set tradevolume random-normal mean-initial-trade-volume SD-initial-trade-volume hide-link] 
+        create-export-from ? [set tradevolume random-normal mean-initial-trade-volume SD-initial-trade-volume hide-link]
+        ask diplomaticrelation [who] of ? who [ set attitude attitude * (1 + attitude-trade-increase) ]
+        ]]]
+    set tradingpartners [other-end] of my-in-exports
+    
   ]
 end
 
@@ -1218,8 +1218,8 @@ end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 to set-output [ #first #second ]
-
-ifelse (ticks > memory-length) [
+  
+  if (ticks > memory-length) [
     if ( #first != nobody AND #second != nobody AND (diplomaticrelation [who] of #first [who] of #second) != nobody AND ticks > memory-length) [
       set major-power-war-counter major-power-war-counter + 1
       
@@ -1252,23 +1252,6 @@ ifelse (ticks > memory-length) [
       ;;  set polarisation6 lput weighted-id2 polarisation6
       ;;]
     ]]
-[
-  
-  set Inflection-point-end1 0
-  set Inflection-point-end2 0
-  set FPR-end1 0
-  set FPR-end2 0
-  set Power-end1 0
-  set Power-end2 0
-  set Interdependence-end1end2 0
-  set Conflict-level-end1end2 0
-  set polarisation 0
-  set polarisation2 0
-  set polarisation3 0
-  set polarisation4 0
-  set polarisation5 0
-  set polarisation6 0
-]
 end
 
 to produce-final-output
@@ -1277,12 +1260,12 @@ to produce-final-output
     ;;    Output-power-transition
     ;;    Output-polarisation
     
-    set output-polarisation polarisation
-    set output-polarisation2 polarisation2
-    set output-polarisation3 polarisation3
-    set output-polarisation4 polarisation4
-    set output-polarisation5 polarisation5
-    set output-polarisation6 polarisation6
+    ;;set output-polarisation polarisation
+    ;;set output-polarisation2 polarisation2
+    ;;set output-polarisation3 polarisation3
+    ;;set output-polarisation4 polarisation4
+    ;;set output-polarisation5 polarisation5
+    ;;set output-polarisation6 polarisation6
     
     set Output-Inflection-point-end1 Inflection-point-end1 
     set Output-Inflection-point-end2 Inflection-point-end2 
@@ -1318,13 +1301,13 @@ to-report interdependence [ #self #victim]
       if ( out-export-to #victim != nobody ) [
         set exportshare [tradevolume] of out-export-to #victim
         set importshare [tradevolume] of in-export-from #victim]]
-      
-      let reporter 0
-      let total-gdps [GDP] of #self + [GDP] of #victim
-      
-      carefully [ set reporter ((exportshare + importshare) / total-gdps)] [ set reporter 0]
-      report extra-dependence + reporter
-    ][ report 0 ]
+    
+    let reporter 0
+    let total-gdps [GDP] of #self + [GDP] of #victim
+    
+    carefully [ set reporter ((exportshare + importshare) / total-gdps)] [ set reporter 0]
+    report extra-dependence + reporter
+  ][ report 0 ]
 end
 
 to-report set-power 
@@ -1488,17 +1471,17 @@ to create-conflict ;; stochasticly create conflicts among states, with a randomi
       let a nobody
       let b nobody
       
-        if (any? states )[
-          ask states [ 
-            if (random 1000 <= (( amount-states - rank ) / sum-rank) * 1000) [ 
-              set a who] 
-            if (random 1000 <= (( amount-states - rank ) / sum-rank) * 1000) [ 
-              set b who] 
-          ]
-          ifelse ( a != b AND A != nobody AND B != nobody AND diplomaticrelation a b != nobody) [ if ([conflict] of diplomaticrelation a b = false) [  set repeater repeater - 1 ask diplomaticrelation a b [set conflict true set time-of-last-conflict ticks set source-of-last-conflict
-            "normal" set conflict-level 1]]]
-          [set repeater repeater - 1]  
-        ]]
+      if (any? states )[
+        ask states [ 
+          if (random 1000 <= (( amount-states - rank ) / sum-rank) * 1000) [ 
+            set a who] 
+          if (random 1000 <= (( amount-states - rank ) / sum-rank) * 1000) [ 
+            set b who] 
+        ]
+        ifelse ( a != b AND A != nobody AND B != nobody AND diplomaticrelation a b != nobody) [ if ([conflict] of diplomaticrelation a b = false) [  set repeater repeater - 1 ask diplomaticrelation a b [set conflict true set time-of-last-conflict ticks set source-of-last-conflict
+          "normal" set conflict-level 1]]]
+        [set repeater repeater - 1]  
+      ]]
     
     
     ask diplomaticrelations [
@@ -1506,7 +1489,7 @@ to create-conflict ;; stochasticly create conflicts among states, with a randomi
         set interdependence-magnitude abs (interdependence end1 end2)
       ]]
     
- 
+    
     if (coercion_on = 1)[
       repeat repeater2 [
         let value 0
@@ -1515,15 +1498,15 @@ to create-conflict ;; stochasticly create conflicts among states, with a randomi
           ask one-of diplomaticrelations with [interdependence-magnitude = value AND conflict = false] [ set conflict true set time-of-last-conflict ticks set source-of-last-conflict "Asymmetric trade" set conflict-level 1 ]
         ]]]
     
-  
-      let warmongers states with [ FPR-satisfaction > threshold-dissatisfaction AND major-power? = true]
-      repeat count warmongers [
-        if ( any? warmongers = true) [
-          ask one-of warmongers [ 
-            if ( any? my-diplomaticrelations with [ conflict = false]) [
-              ask one-of my-diplomaticrelations with [ conflict = false] [ set conflict true set time-of-last-conflict ticks set source-of-last-conflict "dissatisfaction" set conflict-level 1]]
-            set warmongers warmongers with [self != myself] ]
-        ]]]
+    
+    let warmongers states with [ FPR-satisfaction > threshold-dissatisfaction AND major-power? = true]
+    repeat count warmongers [
+      if ( any? warmongers = true) [
+        ask one-of warmongers [ 
+          if ( any? my-diplomaticrelations with [ conflict = false]) [
+            ask one-of my-diplomaticrelations with [ conflict = false] [ set conflict true set time-of-last-conflict ticks set source-of-last-conflict "dissatisfaction" set conflict-level 1]]
+          set warmongers warmongers with [self != myself] ]
+      ]]]
 end
 
 to conflictmemory
@@ -1573,37 +1556,31 @@ to rank-states ;; derived from  restaurant model in modelling commons. Is there 
 End
 
 to-report request-alliance [ #self #enemy ]
-  ifelse (#self != nobody AND #enemy != nobody AND #self != #enemy) [
-    let potentials []
-    carefully [
-    if (hostile-states != 0 AND friendly-states != 0 AND empty? hostile-states = false AND empty? friendly-states = false ) [
-      if (any? states with [member? #enemy hostile-states AND member? #self friendly-states]) [
-        set potentials [who] of states with [member? #enemy hostile-states AND member? #self friendly-states]]]] [ set potentials []]
-    carefully [
-    foreach potentials [
-      ask states with [who = ?] [
-        let powershare 0
-        
-        carefully [ set powershare power / (power + [power] of #self)] [ set powershare 0.5 ]
-        
-        let target-relation nobody
-        carefully [set target-relation diplomaticrelation [who] of #self [who] of #enemy] [ set target-relation nobody]
-        let actual-reparations-factor 0
-        let actual-attrition-rate 0
-        ask target-relation [set actual-reparations-factor actual-reparations set actual-attrition-rate actual-attrition]
-        
-        let chance-winning pwinning self #enemy #self
-        let expected-spoils (actual-reparations-factor * count [my-provinces] of #enemy) * powershare
-        let expected-losses (actual-reparations-factor * (count my-provinces + count [my-provinces] of #self )) * powershare
-        let military-losses actual-attrition-rate * [fighting-strength] of #enemy 
-        let loss-of-trade-direct interdependence self #enemy
-        ifelse ( chance-winning * expected-spoils - expected-losses * (1 - chance-winning) - military-losses - loss-of-trade-direct < 0 ) 
-        [ set potentials remove ? potentials]   
-        [ set potentials remove ? potentials
-          set potentials lput self potentials]
-      ]]] [ set potentials []]
-    report potentials]
-  [report nobody]
+  let potentials []
+  if (hostile-states != 0 AND friendly-states != 0 AND empty? hostile-states = false AND empty? friendly-states = false ) [
+  set potentials [who] of states with [member? #enemy hostile-states AND member? #self friendly-states]]
+  foreach potentials [
+    ask states with [who = ?] [
+      let powershare 0
+      
+      carefully [ set powershare power / (power + [power] of #self)] [ set powershare 0.5 ]
+      
+      let target-relation diplomaticrelation [who] of #self [who] of #enemy
+      let actual-reparations-factor 0
+      let actual-attrition-rate 0
+      ask target-relation [set actual-reparations-factor actual-reparations set actual-attrition-rate actual-attrition]
+      
+      let chance-winning pwinning self #enemy #self
+      let expected-spoils (actual-reparations-factor * count [my-provinces] of #enemy) * powershare
+      let expected-losses (actual-reparations-factor * (count my-provinces + count [my-provinces] of #self )) * powershare
+      let military-losses actual-attrition-rate * [fighting-strength] of #enemy 
+      let loss-of-trade-direct interdependence self #enemy
+      ifelse ( chance-winning * expected-spoils - expected-losses * (1 - chance-winning) - military-losses - loss-of-trade-direct < 0 ) 
+      [ set potentials remove ? potentials]   
+      [ set potentials remove ? potentials
+        set potentials lput self potentials]
+    ]]
+  report potentials
 end
 
 to foreign-policy-role  
