@@ -217,14 +217,14 @@ class PathOfWarModel(NetLogoModelStructureInterface):
 #                            ])
 #     
 # #     abnormal_handling = set([
-# #                             "Inflection-point-end1",
-# #                             "Inflection-point-end2",
-# #                             "FPR-end1",
-# #                             "FPR-end2",
-# #                             "Power-end1",
-# #                             "Power-end2",
-# #                             "Interdependence-end1end2",
-# #                             "Conflict-level-end1end2",
+#                             "Inflection-point-end1",
+#                             "Inflection-point-end2",
+#                             "FPR-end1",
+#                             "FPR-end2",
+#                             "Power-end1",
+#                             "Power-end2",
+#                             "Interdependence-end1end2",
+#                             "Conflict-level-end1end2",
 # #                              ])
 #     
 #     once_handling = set ([ 

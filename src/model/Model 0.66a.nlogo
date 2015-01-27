@@ -1,5 +1,3 @@
-;;extensions [nw ]
-
 ;; <<<<<<<<<<<<<<<<<<<< Variable definitions and Breed creation >>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 breed [states state]
@@ -98,13 +96,12 @@ globals [
   polarity
   power-transition
   polarisation
-  polarisation2
-  polarisation3
-  polarisation4
-  polarisation5
-  polarisation6
-  multiple-MP1
-  multiple-MP2
+  MPW-polarity
+  assessment1
+  assessment2
+  time-since-transition
+  output-multiple-MP1
+  output-multiple-MP2
   
   Output-Inflection-point-end1
   Output-Inflection-point-end2
@@ -322,8 +319,8 @@ to resize-world-method
 end
 
 to setup-output  
-  set multiple-MP1 []
-  set multiple-MP2 []
+  set output-multiple-MP1 []
+  set output-multiple-MP2 []
   set Inflection-point-end1 []
   set Inflection-point-end2 []
   set FPR-end1 []
@@ -333,11 +330,11 @@ to setup-output
   set Interdependence-end1end2 []
   set Conflict-level-end1end2 []
   set polarisation []
-  set polarisation2 []
-  set polarisation3 []
-  set polarisation4 []
-  set polarisation5 []
-  set polarisation6 []
+  set MPW-polarity []
+  set assessment1 []
+  set assessment2 []
+  set time-since-transition []
+  
 end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -357,7 +354,7 @@ to go
   carefully [update-attitudes] [ print "update-attitudes" print error-message]
   carefully [conflictmemory] [ print "conflictmemory" print error-message]
   carefully [foreign-policy-role] [ print "foreign-policy-role" print error-message]
-  produce-final-output
+  ;;produce-final-output
   tick  
 end
 
@@ -742,8 +739,6 @@ to interact
         set counter-round counter-round + 1  set decision-first 0 set decision-second 0]
       
       
-      
-      
       if (( decision-first = "mobilise & fight" AND decision-second = "militarycapabilities") OR (decision-first = "mobilise & fight" AND decision-second = "alliance") OR ( decision-first = "escalate" AND decision-second = "militarycapabilities" ) OR ( decision-first = "escalate" AND decision-second = "alliance" )) [ ;; states now have the choice: fight or submit
         
         set counter-round 0
@@ -853,6 +848,8 @@ to wage-war [ #first #second ];; fight wars etc.
     
     let pWinningFirst 0
     let pWinningSecond 0
+    let multiple-MP1 0
+    let multiple-MP2 0
     
     set pWinningFirst pwinning #first #second nobody  
     set pWinningSecond pwinning #second #first nobody 
@@ -865,9 +862,9 @@ to wage-war [ #first #second ];; fight wars etc.
     if ([Power > threshold-major-power] of #first AND [Power > threshold-major-power] of #second)[ 
       let counter1 count [alliance-neighbors with [Power > threshold-major-power]] of #first
       let counter2 count [alliance-neighbors with [Power > threshold-major-power]] of #second
-      set-output #first #second
-      set multiple-MP1 lput (1 + counter1) multiple-MP1
-      set multiple-MP2 lput (1 + counter2) multiple-MP2      
+      set multiple-MP1 (1 + counter1) 
+      set multiple-MP2 (1 + counter2)     
+      set-output #first #second multiple-MP1 multiple-MP2  
     ]
     
     if ([Power > threshold-major-power] of #first AND any? [alliance-neighbors with [Power > threshold-major-power]] of #second) [ 
@@ -875,19 +872,19 @@ to wage-war [ #first #second ];; fight wars etc.
       let counter2 count [alliance-neighbors with [Power > threshold-major-power]] of #second
       let relevant-state nobody
       set relevant-state one-of [alliance-neighbors with [Power > threshold-major-power]] of #second
-      set-output #first relevant-state
-      set multiple-MP1 lput (1 + counter1) multiple-MP1
-      set multiple-MP2 lput counter2 multiple-MP2 
+      set multiple-MP1  (1 + counter1) 
+      set multiple-MP2  counter2  
+      set-output #first relevant-state multiple-MP1 multiple-MP2
     ]
     
     if (any? [alliance-neighbors  with [Power > threshold-major-power]] of #first AND [Power > threshold-major-power] of #second )[
       let counter1 count [alliance-neighbors with [Power > threshold-major-power]] of #first
       let counter2 count [alliance-neighbors with [Power > threshold-major-power]] of #second
       let relevant-state nobody
-      set relevant-state one-of [alliance-neighbors with [Power > threshold-major-power]] of #first
-      set-output #second relevant-state
-      set multiple-MP1 lput counter1 multiple-MP1
-      set multiple-MP2 lput (1 + counter2) multiple-MP2 
+      set relevant-state one-of [alliance-neighbors with [Power > threshold-major-power]] of #first     
+      set multiple-MP1  counter1 
+      set multiple-MP2  (1 + counter2)  
+      set-output #second relevant-state multiple-MP1 multiple-MP2
     ]
     
     if ( any? [alliance-neighbors  with [Power > threshold-major-power]] of #first  AND any? [alliance-neighbors with [Power > threshold-major-power]] of #second)[
@@ -896,10 +893,10 @@ to wage-war [ #first #second ];; fight wars etc.
       let relevant-state1 nobody
       let relevant-state2 nobody
       set relevant-state1 one-of [alliance-neighbors with [Power > threshold-major-power]] of #first
-      set relevant-state2 one-of [alliance-neighbors with [Power > threshold-major-power]] of #second        
-      set-output relevant-state1 relevant-state2
-      set multiple-MP1 lput counter1 multiple-MP1
-      set multiple-MP2 lput counter2 multiple-MP2 
+      set relevant-state2 one-of [alliance-neighbors with [Power > threshold-major-power]] of #second            
+      set multiple-MP1  counter1 
+      set multiple-MP2  counter2  
+      set-output relevant-state1 relevant-state2 multiple-MP1 multiple-MP2
     ]
     
     
@@ -1217,56 +1214,65 @@ end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;; To-report Procedures ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-to set-output [ #first #second ]
-  
+to set-output [ #first #second #counter1 #counter2]  
   if (ticks > memory-length) [
     if ( #first != nobody AND #second != nobody AND (diplomaticrelation [who] of #first [who] of #second) != nobody AND ticks > memory-length) [
-      set major-power-war-counter major-power-war-counter + 1
+      set major-power-war-counter major-power-war-counter + 1      
+      carefully [
+        set MPW-polarity lput polarity MPW-polarity      
+        let time-of-transition 0      
+        carefully [set time-of-transition last power-transition][ set time-of-transition 0]
+        set time-since-transition lput (ticks - time-of-transition) time-since-transition
+        
+        let assessment-pwinning1 pwinning #first #second nobody
+        let assessment-pwinning2 pwinning #second #first nobody
+        set assessment1 lput assessment-pwinning1 assessment1
+        set assessment2 lput assessment-pwinning2 assessment2
+        
+        set output-multiple-MP1 lput #counter1 output-multiple-MP1
+        set output-multiple-MP2 lput #counter2 output-multiple-MP2
+      ] [print error-message print 31111]
       
-      set Inflection-point-end1 lput [inflectionpoint-category] of #first Inflection-point-end1
-      set Inflection-point-end2 lput [inflectionpoint-category] of #second Inflection-point-end2
-      set FPR-end1 lput [FPR-satisfaction] of #first FPR-end1
-      set FPR-end2 lput [FPR-satisfaction] of #second FPR-end2
-      set Power-end1 lput [Power] of #first Power-end1
-      set Power-end2 lput [Power] of #second Power-end2
-      let target (diplomaticrelation [who] of #first [who] of #second)
-      set Interdependence-end1end2 lput [Interdependence-magnitude] of target Interdependence-end1end2
-      set Conflict-level-end1end2 lput [Conflict-level] of target Conflict-level-end1end2
+      carefully [
+        set Inflection-point-end1 lput [inflectionpoint-category] of #first Inflection-point-end1
+        set Inflection-point-end2 lput [inflectionpoint-category] of #second Inflection-point-end2
+        set FPR-end1 lput [FPR-satisfaction] of #first FPR-end1
+        set FPR-end2 lput [FPR-satisfaction] of #second FPR-end2
+        set Power-end1 lput [Power] of #first Power-end1
+        set Power-end2 lput [Power] of #second Power-end2
+        let target (diplomaticrelation [who] of #first [who] of #second)
+        set Interdependence-end1end2 lput [Interdependence-magnitude] of target Interdependence-end1end2
+        set Conflict-level-end1end2 lput [Conflict-level] of target Conflict-level-end1end2
+      ] [print error-message print 41111]
       
-      ;;nw:set-context states diplomaticrelations
-      ;;ask #first [
-      ;;  let centrality1 nw:eigenvector-centrality
-      ;;  let weighted-att1 nw:weighted-closeness-centrality "attitude"
-      ;;  let weighted-id1 nw:weighted-closeness-centrality "ideology-similarity"
-      ;;  set polarisation lput centrality1 polarisation
-      ;;;  set polarisation3 lput weighted-att1 polarisation3
-      ;;  set polarisation5 lput weighted-id1 polarisation5
-      ;;]
+      let counter 0
+      let counter2 0
+      carefully[
+        set counter length [friendly-states] of #first
+        set counter2 length [friendly-states] of #second
+      ] [print error-message print 21111]
       
-      ;;ask #second [
-      ;;  let centrality2 nw:eigenvector-centrality
-      ;;  let weighted-att2 nw:weighted-closeness-centrality "attitude"
-      ;;  let weighted-id2 nw:weighted-closeness-centrality "ideology-similarity"        
-      ;;  set polarisation2 lput centrality2 polarisation2
-      ;;  set polarisation4 lput weighted-att2 polarisation4
-      ;;  set polarisation6 lput weighted-id2 polarisation6
-      ;;]
+      let amount-first 0
+      let amount-second 0
+      
+      carefully[
+        foreach [friendly-states] of #first [if (? != nobody) [if (member? ? [hostile-states] of #second)[set amount-first amount-first + 1]]]
+        foreach [friendly-states] of #second [if (? != nobody) [if (member? ? [hostile-states] of #first)[set amount-second amount-second + 1]]]
+      ] [print error-message print 11111]
+      
+      
+      carefully [set amount-first (amount-first / counter)] [ set amount-first 1 ]
+      carefully [set amount-second (amount-second / counter2)] [ set amount-second 1 ]
+      
+      carefully[ 
+        set polarisation lput (amount-first * amount-second) polarisation
+      ] [print error-message print 51111]
     ]]
 end
 
 to produce-final-output
-  if ( ticks = 499) [
-    
-    ;;    Output-power-transition
-    ;;    Output-polarisation
-    
-    ;;set output-polarisation polarisation
-    ;;set output-polarisation2 polarisation2
-    ;;set output-polarisation3 polarisation3
-    ;;set output-polarisation4 polarisation4
-    ;;set output-polarisation5 polarisation5
-    ;;set output-polarisation6 polarisation6
-    
+  if ( ticks = 499) [    
+    set output-polarisation polarisation      
     set Output-Inflection-point-end1 Inflection-point-end1 
     set Output-Inflection-point-end2 Inflection-point-end2 
     set Output-FPR-end1 FPR-end1 

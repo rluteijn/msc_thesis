@@ -16,7 +16,7 @@ class PathOfWarModel(NetLogoModelStructureInterface):
     model_file = r'/Model 0.66a.nlogo'
     
     run_length = 500
-    replications = 10
+    replications = 2
    
     uncertainties = [
                         ParameterUncertainty ((0, 0.3), "SD-perception"),
@@ -30,7 +30,7 @@ class PathOfWarModel(NetLogoModelStructureInterface):
                         ParameterUncertainty ((0, 0.5), "attitude-decrease-bargain"),
                         ParameterUncertainty ((0, 0.5), "attitude-decrease-submitted"),
                         ParameterUncertainty ((2.5, 3.5), "Threshold-major-power"),
-                        ParameterUncertainty ((0, 10), "SD-initial-trade-volume"),
+#                         ParameterUncertainty ((0, 10), "SD-initial-trade-volume"),
                         ParameterUncertainty ((1.009, 1.011), "mean-GDP-growth"),
                         ParameterUncertainty ((0, 0.05), "SD-population-growth"),
                         ParameterUncertainty ((0.9, 1.1), "mean-military-spending"),
@@ -38,11 +38,11 @@ class PathOfWarModel(NetLogoModelStructureInterface):
                         ParameterUncertainty ((0, 10), "cost-of-new-trade"),
                         ParameterUncertainty ((0, 0.1), "SD-military-spending"),
                         ParameterUncertainty ((0, 1), "attitude-decrease-friendly"),
-                        ParameterUncertainty ((30, 70), "SD-initial-military-capabilities"),
-                        ParameterUncertainty ((1, 10), "Max-initial-patch-population"),
+#                         ParameterUncertainty ((30, 70), "SD-initial-military-capabilities"),
+#                         ParameterUncertainty ((1, 10), "Max-initial-patch-population"),
                         ParameterUncertainty ((0, 0.05), "SD-GDP-growth"),
-                        ParameterUncertainty ((0, 3), "Max-initial-GDPperCapita"),
-                        ParameterUncertainty ((1, 10), "mean-initial-trade-volume"),
+#                         ParameterUncertainty ((0, 3), "Max-initial-GDPperCapita"),
+#                         ParameterUncertainty ((1, 10), "mean-initial-trade-volume"),
                         ParameterUncertainty ((3, 10), "threshold-counter", integer=True),
                         ParameterUncertainty ((0.9, 1.1), "mean-Perception"),
                         ParameterUncertainty ((0, 0.1), "SD-tradevolume-growth"),
@@ -51,7 +51,7 @@ class PathOfWarModel(NetLogoModelStructureInterface):
                         ParameterUncertainty ((0, 1), "increased-mil-spending"),
                         ParameterUncertainty ((0, 0.1), "interdependence-pAttack"),
                         ParameterUncertainty ((0, 0.8), "attitude-decrease-war"),
-                        ParameterUncertainty ((50, 150), "mean-initial-military-capabilities"),
+#                         ParameterUncertainty ((50, 150), "mean-initial-military-capabilities"),
                         ParameterUncertainty ((0, 10), "cost-per-distance"),
                         ParameterUncertainty ((0.05, 0.15), "attitude-trade-increase" ),
                         ParameterUncertainty ((3, 7), "threshold-dissatisfaction"),
@@ -90,15 +90,9 @@ class PathOfWarModel(NetLogoModelStructureInterface):
                 Outcome("Output-Power-end1", time=True),
                 Outcome("Output-Power-end2", time=True),
                 Outcome("Output-Interdependence-end1end2", time=True),
-                Outcome("Output-Conflict-level-end1end2", time=True),
-   
-#                 Outcome("output-polarisation", time=True ),
-#                 Outcome("output-polarisation2", time=True ),
-#                 Outcome("output-polarisation3", time=True ),
-#                 Outcome("output-polarisation4", time=True ),
-#                 Outcome("output-polarisation5", time=True ),
-#                 Outcome("output-polarisation6", time=True ),
-
+                Outcome("Output-Conflict-level-end1end2", time=True),   
+                Outcome("output-polarisation", time=True ),
+                
                 Outcome("states", time=True ),
                 Outcome("major-power-war-counter", time=True),
                 Outcome("war-counter", time=True),
@@ -185,12 +179,8 @@ class PathOfWarModel(NetLogoModelStructureInterface):
                             "Output-Power-end2",
                             "Output-Interdependence-end1end2",
                             "Output-Conflict-level-end1end2",                            
-#                             "output-polarisation",
-#                             "output-polarisation2",
-#                             "output-polarisation3",
-#                             "output-polarisation4",
-#                             "output-polarisation5",
-#                             "output-polarisation6",
+                            "output-polarisation",
+
                             ])                    
 
 if __name__ == '__main__':
@@ -204,7 +194,7 @@ if __name__ == '__main__':
     ensemble.add_model_structure(msi)
     ensemble.parallel =  True
     
-    nr_runs = 500
+    nr_runs = 8
     results = ensemble.perform_experiments(nr_runs, reporting_interval=1)
     
     fn = r'./data/{} runs 19 jan.tar.gz'.format(nr_runs)
