@@ -96,6 +96,7 @@ globals [
   Power-end2
   Interdependence-end1end2
   Conflict-level-end1end2
+  Conflict-source
   polarity
   power-transition
   polarisation
@@ -321,6 +322,7 @@ to setup-output
   set Power-end2 []
   set Interdependence-end1end2 []
   set Conflict-level-end1end2 []
+  set Conflict-source []
   set polarisation []
   set MPW-polarity []
   set assessment1 []
@@ -349,10 +351,11 @@ to go
   carefully [setup-globals] [ print "setup-globals" print error-message]
   carefully [create-conflict] [ print "create-conflict" print error-message]
   carefully [observe] [ print "observe" print error-message]
-  ;;carefully [update-attributes] [ print "update-attributes" print error-message]
-  update-attributes
+  carefully [update-attributes] [ print "update-attributes" print error-message]
+  ;;update-attributes
   carefully [decide] [ print "decide" print error-message]  
-  carefully [interact  ] [ print "interact" print error-message]
+  ;;carefully [interact  ] [ print "interact" print error-message]
+  interact
   carefully [change-traderelations] [ print "change-traderelations" print error-message]
   carefully [update-attitudes] [ print "update-attitudes" print error-message]
   carefully [conflictmemory] [ print "conflictmemory" print error-message]
@@ -924,7 +927,9 @@ to record-conflict [ war #first #second ]
       let counter1 count [alliance-neighbors with [Power > threshold-major-power]] of #first
       let counter2 count [alliance-neighbors with [Power > threshold-major-power]] of #second
       let relevant-state nobody
-      set relevant-state one-of [alliance-neighbors with [Power > threshold-major-power]] of #second
+      let relevant-MP [alliance-neighbors with [Power > threshold-major-power]] of #second
+      let power1 max [power] of relevant-MP
+      set relevant-state one-of [alliance-neighbors with [Power = power1]] of #second
       set multiple-MP1  (1 + counter1) 
       set multiple-MP2  counter2  
       set type-conflict 2
@@ -935,7 +940,9 @@ to record-conflict [ war #first #second ]
         let counter1 count [alliance-neighbors with [Power > threshold-major-power]] of #first
         let counter2 count [alliance-neighbors with [Power > threshold-major-power]] of #second
         let relevant-state nobody
-        set relevant-state one-of [alliance-neighbors with [Power > threshold-major-power]] of #first     
+        let relevant-MP [alliance-neighbors with [Power > threshold-major-power]] of #first
+        let power1 max [power] of relevant-MP
+        set relevant-state one-of [alliance-neighbors with [Power = power1]] of #first     
         set multiple-MP1  counter1 
         set multiple-MP2  (1 + counter2)  
         set type-conflict 2
@@ -947,8 +954,12 @@ to record-conflict [ war #first #second ]
           let counter2 count [alliance-neighbors with [Power > threshold-major-power]] of #second
           let relevant-state1 nobody
           let relevant-state2 nobody
-          set relevant-state1 one-of [alliance-neighbors with [Power > threshold-major-power]] of #first
-          set relevant-state2 one-of [alliance-neighbors with [Power > threshold-major-power]] of #second            
+          let relevant-MP1 [alliance-neighbors with [Power > threshold-major-power]] of #first
+          let relevant-MP2 [alliance-neighbors with [Power > threshold-major-power]] of #second
+          let power1 max [power] of relevant-MP1
+          let power2 max [power] of relevant-MP2
+          set relevant-state1 one-of [alliance-neighbors with [Power = power1]] of #first
+          set relevant-state2 one-of [alliance-neighbors with [Power = power2]] of #second            
           set multiple-MP1  counter1 
           set multiple-MP2  counter2  
           set type-conflict 3
@@ -1296,6 +1307,7 @@ to set-output [ war type-conflict #first #second #counter1 #counter2 highest-con
         ]
       
       carefully [
+        set conflict-source lput source-of-last-conflict conflict-source
         set MPW-polarity lput polarity MPW-polarity      
         let time-of-transition 0      
         carefully [set time-of-transition last power-transition][ set time-of-transition 0]
@@ -1359,6 +1371,8 @@ to set-output [ war type-conflict #first #second #counter1 #counter2 highest-con
         
         let power1 [power] of #first
         let power2 [power] of #second
+        if (power1 = 0) [ set power1 0.00001]
+        if (power2 = 0) [ set power2 0.00001]
         let mean-projection1 mean [power-growth-memory] of #first
         let mean-projection2 mean [power-growth-memory] of #second
         let projected-growth1 mean-projection1 ^ 5
@@ -1406,10 +1420,13 @@ to-report interdependence [ #self #victim]
           set importshare [tradevolume] of in-export-from #victim]]]
     
     let reporter 0
-    let total-gdps [GDP] of #self + [GDP] of #victim    
+    let total-gdps ([GDP] of #self + [GDP] of #victim)
+    if ( total-gdps = 0) [ set total-gdps 0.00001]
     set reporter ((exportshare + importshare) / total-gdps)
     if (reporter > 10) [ set reporter 10]
-    report extra-dependence + reporter]
+    if (reporter < -10) [set reporter 0]
+    report (extra-dependence + reporter)
+  ]
 end
 
 to-report set-power 
@@ -1566,6 +1583,7 @@ to create-conflict ;; stochasticly create conflicts among states, with a randomi
     let amount count DiplomaticRelations
     let amount-states count states
     let sum-rank sum [rank] of states
+    if (sum-rank = 0) [ set sum-rank 1]
     let repeater 1 + round ( random-pAttack * amount)
     let repeater2 round (count diplomaticrelations * interdependence-pAttack)
     
@@ -1581,32 +1599,29 @@ to create-conflict ;; stochasticly create conflicts among states, with a randomi
             set b who] 
         ]
         ifelse ( a != b AND A != nobody AND B != nobody AND diplomaticrelation a b != nobody) [ if ([conflict] of diplomaticrelation a b = false) [  set repeater repeater - 1 ask diplomaticrelation a b [set conflict true set time-of-last-conflict ticks set source-of-last-conflict
-          "normal" set conflict-level 1]]]
+          1 set conflict-level 1]]]
         [set repeater repeater - 1]  
-      ]]
-    
+      ]]    
     
     ask diplomaticrelations [
       if (end1 != nobody AND end2 != nobody)[
         set interdependence-magnitude abs (interdependence end1 end2)        
-      ]]
-    
+      ]]    
     
     if (coercion_on = 1)[
       repeat repeater2 [
         let value 0
         if (any? diplomaticrelations with [conflict = false ]) [set value max [interdependence-magnitude] of diplomaticrelations with [conflict = false ]]
         if (any? diplomaticrelations with [conflict = false AND interdependence-magnitude = value]) [
-          ask one-of diplomaticrelations with [interdependence-magnitude = value AND conflict = false] [ set conflict true set time-of-last-conflict ticks set source-of-last-conflict "Asymmetric trade" set conflict-level 1 ]
-        ]]]
-    
+          ask one-of diplomaticrelations with [interdependence-magnitude = value AND conflict = false] [ set conflict true set time-of-last-conflict ticks set source-of-last-conflict 2 set conflict-level 1 ]
+        ]]]    
     
     let warmongers states with [ FPR-satisfaction > threshold-dissatisfaction AND major-power? = true]
     repeat count warmongers [
       if ( any? warmongers = true) [
         ask one-of warmongers [ 
           if ( any? my-diplomaticrelations with [ conflict = false]) [
-            ask one-of my-diplomaticrelations with [ conflict = false] [ set conflict true set time-of-last-conflict ticks set source-of-last-conflict "dissatisfaction" set conflict-level 1]]
+            ask one-of my-diplomaticrelations with [ conflict = false] [ set conflict true set time-of-last-conflict ticks set source-of-last-conflict 3 set conflict-level 1]]
           set warmongers warmongers with [self != myself] ]
       ]]]
 end
@@ -1614,9 +1629,9 @@ end
 to conflictmemory
   ask diplomaticrelations [
     if (ticks = time-of-decision)[
-      set conflict-memory lput (list time-of-last-conflict source-of-last-conflict type-of-last-conflict) conflict-memory] 
+      set conflict-memory lput time-of-last-conflict conflict-memory] 
     let comparison ticks - memory-length
-    if (empty? conflict-memory = false AND first (first conflict-memory) <= comparison) [set conflict-memory remove (first conflict-memory) conflict-memory]
+    if (empty? conflict-memory = false AND (first conflict-memory) <= comparison) [set conflict-memory remove (first conflict-memory) conflict-memory]
   ]
 end
 
@@ -2608,35 +2623,6 @@ threshold-force
 1
 0
 Number
-
-PLOT
-920
-100
-1325
-440
-plot 1
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 1 -16777216 true "" "if(any? states)[histogram [technological-advancement] of states]"
-
-MONITOR
-585
-595
-642
-640
-max TA
-max[technological-advancement] of states
-2
-1
-11
 
 @#$#@#$#@
 ## WHAT IS IT?

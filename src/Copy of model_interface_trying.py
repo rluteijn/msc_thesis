@@ -15,8 +15,8 @@ from expWorkbench.ema_exceptions import CaseError
 class PathOfWarModel(NetLogoModelStructureInterface):
     model_file = r'/Model 0.68.nlogo'
     
-    run_length = 500
-    replications = 25
+    run_length = 300
+    replications = 2
    
     uncertainties = [
                         ParameterUncertainty ((0, 0.3), "SD-perception"),
@@ -84,6 +84,13 @@ class PathOfWarModel(NetLogoModelStructureInterface):
                     ]
     
     outcomes = [ 
+                Outcome("states", time=True ),
+                Outcome("major-power-war-counter", time=True),
+                Outcome("war-counter", time=True),
+                Outcome("polarity", time=True),
+                Outcome("amount-conflicts", time=True),
+                Outcome("power-transition-counter", time=True),       
+                
                 Outcome("Inflection-point-end1", time=False),
                 Outcome("Inflection-point-end2", time=False),
                 Outcome("FPR-end1", time=False),
@@ -98,27 +105,20 @@ class PathOfWarModel(NetLogoModelStructureInterface):
                 Outcome("assessment2", time=False),
                 Outcome("time-since-transition", time=False),
                 Outcome("output-multiple-MP1", time=False),
-                Outcome("output-multiple-MP2", time=False),
-                
+                Outcome("output-multiple-MP2", time=False),                
                 Outcome("MPW-ideology-similarity", time=False),
                 Outcome("MPW-technological-advancement1", time=False),
                 Outcome("MPW-technological-advancement2", time=False),
                 Outcome("MPW-risk-averseness1", time=False),
-                Outcome("MPW-risk-averseness2", time=False),
-                
-                Outcome("states", time=True ),
-                Outcome("major-power-war-counter", time=True),
-                Outcome("war-counter", time=True),
-                Outcome("polarity", time=True),
-                Outcome("amount-conflicts", time=True),
-                Outcome("power-transition-counter", time=True),                 
-
+                Outcome("MPW-risk-averseness2", time=False),        
                 Outcome("MPW-type-of-conflict", time=False),
                 Outcome("MPW", time=False),
                 Outcome("max-conflict-level", time=False),
                 Outcome("top-dog", time=False),
                 Outcome("time-since-MPW", time=False),
                 Outcome("expected-transition", time=False),
+                Outcome("Conflict-source", time=False),
+                Outcome("power-transition", time=False),
                 ]
     
     def run_model(self, case):           
@@ -211,6 +211,8 @@ class PathOfWarModel(NetLogoModelStructureInterface):
                             "top-dog",
                             "time-since-MPW",
                             "expected-transition",
+                            "Conflict-source"
+                            "power-transition"
                             ])                    
 
 if __name__ == '__main__':
@@ -224,8 +226,8 @@ if __name__ == '__main__':
     ensemble.add_model_structure(msi)
     ensemble.parallel =  True
     
-    nr_runs = 5000
+    nr_runs = 8
     results = ensemble.perform_experiments(nr_runs, reporting_interval=1)
     
-    fn = r'./data/{} runs 26 jan.tar.gz'.format(nr_runs)
+    fn = r'./data/{} runs 28 jan.tar.gz'.format(nr_runs)
     save_results(results, fn)  
