@@ -15,8 +15,8 @@ from expWorkbench.ema_exceptions import CaseError
 class PathOfWarModel(NetLogoModelStructureInterface):
     model_file = r'/Model 0.68.nlogo'
     
-    run_length = 300
-    replications = 2
+    run_length = 500
+    replications = 10
    
     uncertainties = [
                         ParameterUncertainty ((0, 0.3), "SD-perception"),
@@ -226,7 +226,7 @@ if __name__ == '__main__':
     ensemble.add_model_structure(msi)
     ensemble.parallel =  True
     
-    nr_runs = 8
+    nr_runs = 5000
     results = ensemble.perform_experiments(nr_runs, reporting_interval=1)
     
     fn = r'./data/{} runs 28 jan.tar.gz'.format(nr_runs)
