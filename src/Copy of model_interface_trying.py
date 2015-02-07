@@ -155,7 +155,7 @@ class PathOfWarModel(NetLogoModelStructureInterface):
                     result = result.strip('[')# haakje weghalen, welke alleen in de lijst nog zitten eventueel
                     result = result.strip(']')# haakje weghalen, welke alleen in de lijst nog zitten eventueel
                     result = result.split() # splitsen op elementen: nullen en een list
-                    results = np.zeros((self.run_length*6,)) # lege array maken
+                    results = np.zeros((self.run_length*10)) # lege array maken
                     for j, entry in enumerate(result):                           
                          if entry:
                             entry = float(entry)
@@ -211,8 +211,8 @@ class PathOfWarModel(NetLogoModelStructureInterface):
                             "top-dog",
                             "time-since-MPW",
                             "expected-transition",
-                            "Conflict-source"
-                            "power-transition"
+                            "Conflict-source",
+                            "power-transition",
                             ])                    
 
 if __name__ == '__main__':
@@ -226,7 +226,7 @@ if __name__ == '__main__':
     ensemble.add_model_structure(msi)
     ensemble.parallel =  True
     
-    nr_runs = 5000
+    nr_runs = 1000
     results = ensemble.perform_experiments(nr_runs, reporting_interval=1)
     
     fn = r'./data/{} runs 28 jan.tar.gz'.format(nr_runs)
