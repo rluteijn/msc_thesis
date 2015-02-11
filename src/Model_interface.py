@@ -16,9 +16,10 @@ class PathOfWarModel(NetLogoModelStructureInterface):
     model_file = r'/Model 0.68.nlogo'
     
     run_length = 500
-    replications = 10
+    replications = 2
    
     uncertainties = [
+#                         ParameterUncertainty ((-214748364 , 2147483647), "seed"),
                         ParameterUncertainty ((0, 0.3), "SD-perception"),
                         ParameterUncertainty ((1, 10), "uW1"),
                         ParameterUncertainty ((1, 10), "uW2"),
@@ -79,6 +80,8 @@ class PathOfWarModel(NetLogoModelStructureInterface):
                         ParameterUncertainty ((0, 0.3), "amount_of_ideology_change" ),
 #                         CategoricalUncertainty ((0, 1), "coercion_on"),
                         ParameterUncertainty ((0, 1), "FPR-impact"),
+                        
+                        CategoricalUncertainty ((0, 1, 2, 3, 4, 5, 6, 7, 8, 9), "seed"),
                         ##CategoricalUncertainty ((10, 20, 30), "worldsize" ),
                         ##CategoricalUncertainty ((2, 200), "amount-of-states"),
                     ]
@@ -119,6 +122,8 @@ class PathOfWarModel(NetLogoModelStructureInterface):
                 Outcome("expected-transition", time=False),
                 Outcome("Conflict-source", time=False),
                 Outcome("power-transition", time=False),
+                Outcome("conflict-time", time=False),
+                Outcome("war-time", time=False),
                 ]
     
     def run_model(self, case):           
@@ -213,6 +218,8 @@ class PathOfWarModel(NetLogoModelStructureInterface):
                             "expected-transition",
                             "Conflict-source",
                             "power-transition",
+                            "conflict-time",
+                            "war-time",
                             ])                    
 
 if __name__ == '__main__':
@@ -226,8 +233,8 @@ if __name__ == '__main__':
     ensemble.add_model_structure(msi)
     ensemble.parallel =  True
     
-    nr_runs = 1000
+    nr_runs = 8
     results = ensemble.perform_experiments(nr_runs, reporting_interval=1)
     
-    fn = r'./data/{} runs 28 jan.tar.gz'.format(nr_runs)
+    fn = r'./data/{} runs 11 feb.tar.gz'.format(nr_runs)
     save_results(results, fn)  

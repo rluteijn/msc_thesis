@@ -1,5 +1,4 @@
 ;; <<<<<<<<<<<<<<<<<<<< Variable definitions and Breed creation >>>>>>>>>>>>>>>>>>>>>>>>>>>
-
 breed [states state]
 undirected-link-breed  [Alliances Alliance]
 undirected-link-breed  [DiplomaticRelations DiplomaticRelation]
@@ -97,6 +96,8 @@ globals [
   Interdependence-end1end2
   Conflict-level-end1end2
   Conflict-source
+  conflict-time
+  war-time
   polarity
   power-transition
   polarisation
@@ -126,6 +127,7 @@ globals [
 to setup
   clear-all
   reset-ticks
+  random-seed seed
   carefully [resize-world-method] [  print "resize-world-method " print error-message]
   carefully [create-water] [ print "create-water "  print error-message]
   carefully [creating-states] [ print "creating-states "  print error-message]
@@ -323,6 +325,8 @@ to setup-output
   set Interdependence-end1end2 []
   set Conflict-level-end1end2 []
   set Conflict-source []
+  set conflict-time []
+  set war-time []
   set polarisation []
   set MPW-polarity []
   set assessment1 []
@@ -480,6 +484,7 @@ to update-attributes ;; endogenous growth of variables since last tick
       let mean-FPR mean [FPR-satisfaction] of states
       set w1 (uw1 + FPR-impact * (FPR-satisfaction - mean-FPR))
       set w2 (uw2 - FPR-impact * (FPR-satisfaction + mean-FPR))
+      set risk-averseness w2 / w1
       
       if (w1 < 0) [ set w1 0]
       if (w2 < 0) [ set w2 0]
@@ -1308,6 +1313,8 @@ to set-output [ war type-conflict #first #second #counter1 #counter2 highest-con
       
       carefully [
         set conflict-source lput source-of-last-conflict conflict-source
+        set conflict-time lput time-of-last-conflict conflict-time
+        set war-time lput ticks war-time
         set MPW-polarity lput polarity MPW-polarity      
         let time-of-transition 0      
         carefully [set time-of-transition last power-transition][ set time-of-transition 0]
@@ -2620,6 +2627,17 @@ INPUTBOX
 1225
 threshold-force
 5
+1
+0
+Number
+
+INPUTBOX
+865
+1175
+1017
+1235
+seed
+1
 1
 0
 Number
