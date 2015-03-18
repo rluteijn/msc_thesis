@@ -74,6 +74,7 @@ DiplomaticRelations-own [
   conflict-memory
   highest-conflict-level
   Initiator
+  relation-polarisation
 ]
 
 exports-own [ 
@@ -127,7 +128,7 @@ globals [
 to setup
   clear-all
   reset-ticks
-  random-seed seed
+  ;;random-seed seed
   carefully [resize-world-method] [  print "resize-world-method " print error-message]
   carefully [create-water] [ print "create-water "  print error-message]
   carefully [creating-states] [ print "creating-states "  print error-message]
@@ -278,6 +279,7 @@ to create-diplomaticnetwork
     hide-link
     set conflict false
     set highest-conflict-level 0
+    ;;set relation-polarisation polarisation-pair end1 end2
     set decision-first 0
     set decision-second 0
     set counter-round 0
@@ -516,6 +518,8 @@ to update-attributes ;; endogenous growth of variables since last tick
     ]]
   if (any? states with [power > Threshold-major-power ]) [ ask states with [power > Threshold-major-power ] [set Major-Power? true ]]
   ifelse ( count states with [Major-Power? = true] = 1) [ set polarity 1 ] [ ifelse(count states with [Major-Power? = true] = 2) [set polarity 2 ] [set polarity 3] ]
+  
+  ask diplomaticrelations [set relation-polarisation polarisation-pair end1 end2]
 end
 
 to observe ;; identify threats, potential allies, etc.
@@ -1339,32 +1343,9 @@ to set-output [ war type-conflict #first #second #counter1 #counter2 highest-con
         let target-MP (diplomaticrelation [who] of #first [who] of #second)
         set Interdependence-end1end2 lput [Interdependence-magnitude] of target-MP Interdependence-end1end2
         set Conflict-level-end1end2 lput [Conflict-level] of target Conflict-level-end1end2
+        set polarisation lput (polarisation-pair #first #second) polarisation
       ] [print error-message print 41111]
       
-      let counter 0
-      let counter2 0
-      carefully[
-        set counter length [friendly-states] of #first
-        set counter2 length [friendly-states] of #second
-      ] [print error-message print 21111]
-      
-      let amount-first 0
-      let amount-second 0
-      
-      carefully[
-        foreach [friendly-states] of #first [if (? != nobody) [if (member? ? [hostile-states] of #second)[set amount-first amount-first + 1]]]
-        foreach [friendly-states] of #second [if (? != nobody) [if (member? ? [hostile-states] of #first)[set amount-second amount-second + 1]]]
-      ] [print error-message print 11111]
-      
-      
-      carefully [
-        set amount-first (amount-first / counter)
-        set amount-second (amount-second / counter2)      
-        set polarisation lput (amount-first * amount-second) polarisation
-      ] [
-      ifelse ( counter = 0 AND counter2 = 0) [set polarisation lput 2 polarisation]
-      [set polarisation lput 3 polarisation]
-      ]
       
       carefully[
         let ideology-similarity-mp [ideology-similarity] of diplomaticrelation [who] of #first [who] of #second
@@ -1402,6 +1383,28 @@ to set-output [ war type-conflict #first #second #counter1 #counter2 highest-con
           ]
       ] [print error-message print 61111]            
     ]]
+end
+
+to-report polarisation-pair [#first #second]
+  let counter 0
+  let counter2 0
+  carefully [
+  set counter length [friendly-states] of #first
+  set counter2 length [friendly-states] of #second][]
+  
+  let amount-first 0
+  let amount-second 0
+  foreach [friendly-states] of #first [if (? != nobody) [if (member? ? [hostile-states] of #second)[set amount-first amount-first + 1]]]
+  foreach [friendly-states] of #second [if (? != nobody) [if (member? ? [hostile-states] of #first)[set amount-second amount-second + 1]]]
+  
+  ifelse ( counter = 0 AND counter2 = 0) 
+  [report 2]
+  [ifelse( counter = 0 OR counter2 = 0)
+  [report 3]
+  [set amount-first (amount-first / counter)
+    set amount-second (amount-second / counter2)      
+    report (amount-first * amount-second) ]]
+ 
 end
 
 to show-DiplomaticRelations  
@@ -2637,10 +2640,28 @@ INPUTBOX
 1017
 1235
 seed
-1
+3
 1
 0
 Number
+
+PLOT
+885
+120
+1085
+270
+plot 1
+NIL
+NIL
+0.0
+1.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 0.05 1 -16777216 true "" "histogram [relation-polarisation] of diplomaticrelations"
 
 @#$#@#$#@
 ## WHAT IS IT?
